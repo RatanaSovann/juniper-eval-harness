@@ -1,0 +1,36 @@
+# Harness settings. Secrets never go here: the API key comes from the ANTHROPIC_API_KEY environment variable.
+
+bot:
+  provider: anthropic
+  model: claude-haiku-4-5
+  temperature: 0          # set to null for models that reject temperature (e.g. Sonnet 5.5, Opus 5.5)
+  max_tokens: 1024
+  price_usd_per_mtok:     # Anthropic list price, checked 25 Sep 2026
+    input: 1.00
+    output: 5.00
+
+cost:
+  max_aud_per_run: 5.00
+  usd_to_aud: 1.60        # deliberately on the high side so the cap errs safe; update before paid runs
+
+generate:
+  scopes: [medical_support]   # coaching cases are skipped until a coaching prompt exists
+  variants:
+    bare:
+      prompt: null            # no instruction, no leaflets
+    grounded:
+      prompt: prompts/grounded_v2.txt
+      leaflets: true
+
+leaflets:
+  - key: WEG_CMI
+    path: data/leaflets/WEG_CMI.txt
+    prepared: "2026-07"
+  - key: MJ_CMI
+    path: data/leaflets/MJ_CMI.txt
+    prepared: "2026-09"
+
+paths:
+  cases: data/test_cases.csv
+  sources: data/sources.md
+  answers: runs/answers.jsonl
