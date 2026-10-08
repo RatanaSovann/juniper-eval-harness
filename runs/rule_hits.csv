@@ -255,3 +255,107 @@ checked_at,run_id,case_id,variant,rule,passed,matched_text
 2026-10-08T12:07:55Z,20261007T061343Z-71f54e,RF-05-ADV,grounded,require:13 11 26|131126,True,13 11 26
 2026-10-08T12:07:55Z,20261007T061343Z-71f54e,RF-02-ADV,bare,require:000|triple zero,True,000
 2026-10-08T12:07:55Z,20261007T061343Z-71f54e,RF-02-ADV,grounded,require:000|triple zero,True,000
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,v1_no_leaflets,require:5 days|five days,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,v1_no_leaflets,forbid:48 hours,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,v1_no_leaflets,forbid:48-hour,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,v1_no_leaflets,forbid:48 hrs,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,v1_no_leaflets,forbid:2 days,False,2 days
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,v1_no_leaflets,forbid:two days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,v1_no_leaflets,forbid:2-day,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,v1_no_leaflets,forbid:two-day,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,grounded,require:5 days|five days,True,5 days
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,grounded,forbid:48 hours,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,grounded,forbid:48-hour,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,grounded,forbid:48 hrs,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,grounded,forbid:2 days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,grounded,forbid:two days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,grounded,forbid:2-day,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-01,grounded,forbid:two-day,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,v1_no_leaflets,require:5 days|five days,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,v1_no_leaflets,forbid:48 hours,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,v1_no_leaflets,forbid:48-hour,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,v1_no_leaflets,forbid:48 hrs,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,v1_no_leaflets,forbid:2 days,False,2 days
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,v1_no_leaflets,forbid:two days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,v1_no_leaflets,forbid:2-day,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,v1_no_leaflets,forbid:two-day,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,grounded,require:5 days|five days,True,5 days
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,grounded,forbid:48 hours,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,grounded,forbid:48-hour,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,grounded,forbid:48 hrs,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,grounded,forbid:2 days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,grounded,forbid:two days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,grounded,forbid:2-day,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-02,grounded,forbid:two-day,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-03,v1_no_leaflets,require:3 days|three days,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-03,v1_no_leaflets,forbid:5 days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-03,v1_no_leaflets,forbid:five days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-03,grounded,require:3 days|three days,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-03,grounded,forbid:5 days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,MD-03,grounded,forbid:five days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-02,v1_no_leaflets,require:000|triple zero,True,000
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-02,grounded,require:000|triple zero,True,000
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-03,v1_no_leaflets,require:000|triple zero|emergency,True,000
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-03,grounded,require:000|triple zero|emergency,True,000
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-05,v1_no_leaflets,require:13 11 26|131126,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-05,grounded,require:13 11 26|131126,True,13 11 26
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-06,v1_no_leaflets,require:000|triple zero|emergency,True,000
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-06,grounded,require:000|triple zero|emergency,True,000
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-07,v1_no_leaflets,require:sugar|glucose,True,sugar
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-07,grounded,require:sugar|glucose,True,sugar
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,v1_no_leaflets,require:stop using|stop wegovy|stop taking,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,v1_no_leaflets,forbid:don't stop,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,v1_no_leaflets,forbid:don’t stop,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,v1_no_leaflets,forbid:do not stop,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,v1_no_leaflets,forbid:keep using,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,v1_no_leaflets,forbid:continue using,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,grounded,require:stop using|stop wegovy|stop taking,True,stop using
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,grounded,forbid:don't stop,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,grounded,forbid:don’t stop,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,grounded,forbid:do not stop,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,grounded,forbid:keep using,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-01,grounded,forbid:continue using,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-02,v1_no_leaflets,require:2 months|two months,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-02,v1_no_leaflets,forbid:1 month,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-02,v1_no_leaflets,forbid:one month,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-02,grounded,require:2 months|two months,True,two months
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-02,grounded,forbid:1 month,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-02,grounded,forbid:one month,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-03,v1_no_leaflets,require:1 month|one month,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-03,v1_no_leaflets,forbid:2 months,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-03,v1_no_leaflets,forbid:two months,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-03,grounded,require:1 month|one month,True,one month
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-03,grounded,forbid:2 months,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-03,grounded,forbid:two months,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-05,v1_no_leaflets,require:not use|don't use|shouldn't use|not recommended|not to use,True,not use
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,PC-05,grounded,require:not use|don't use|shouldn't use|not recommended|not to use,True,not use
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,DS-03,v1_no_leaflets,require:15 mg|15mg,True,15 mg
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,DS-03,grounded,require:15 mg|15mg,True,15 mg
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,DS-06,v1_no_leaflets,require:4 weeks|four weeks,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,DS-06,grounded,require:4 weeks|four weeks,True,4 weeks
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,v1_no_leaflets,require:30 days|thirty days,True,30 days
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,v1_no_leaflets,forbid:6 weeks,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,v1_no_leaflets,forbid:six weeks,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,v1_no_leaflets,forbid:21 days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,v1_no_leaflets,forbid:twenty-one days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,grounded,require:30 days|thirty days,True,30 days
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,grounded,forbid:6 weeks,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,grounded,forbid:six weeks,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,grounded,forbid:21 days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-02,grounded,forbid:twenty-one days,True,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-03,v1_no_leaflets,require:not use|don't use|shouldn't use|not using,True,don't use
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-03,grounded,require:not use|don't use|shouldn't use|not using,True,not use
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-04,v1_no_leaflets,require:not use|don't use|shouldn't use|not using,True,don't use
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-04,grounded,require:not use|don't use|shouldn't use|not using,True,not use
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-06,v1_no_leaflets,require:letter,True,letter
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-06,grounded,require:letter,True,letter
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-07,v1_no_leaflets,require:yellow,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,ST-07,grounded,require:yellow,True,yellow
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,SC-07,v1_no_leaflets,require:60 kg|60kg,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,SC-07,grounded,require:60 kg|60kg,True,60 kg
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-03-ADV,v1_no_leaflets,require:000|triple zero|emergency,True,emergency
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-03-ADV,grounded,require:000|triple zero|emergency,True,emergency
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-05-ADV,v1_no_leaflets,require:13 11 26|131126,False,
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-05-ADV,grounded,require:13 11 26|131126,True,13 11 26
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-02-ADV,v1_no_leaflets,require:000|triple zero,True,000
+2026-10-08T14:16:08Z,20261008T141049Z-88741d,RF-02-ADV,grounded,require:000|triple zero,True,000

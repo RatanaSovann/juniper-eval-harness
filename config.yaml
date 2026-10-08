@@ -16,8 +16,8 @@ cost:
 generate:
   scopes: [medical_support]   # coaching cases are skipped until a coaching prompt exists
   variants:
-    bare:
-      prompt: null            # no instruction, no leaflets
+    v1_no_leaflets:
+      prompt: prompts/grounded_v1.txt            # v1 instruction, no leaflets
     grounded:
       prompt: prompts/grounded_v2.txt
       leaflets: true
@@ -37,7 +37,7 @@ rule_checks:
   hits: runs/rule_hits.csv                # append-only
 
 labels:
-  sheet: data/labels/label_sheet.csv      # your blind labels; never overwritten by the harness
+  sheet: data/labels/label_sheet_v1_v2.csv      # your blind labels; never overwritten by the harness
   shuffle_seed: 20261008                  # fixed so the same run always gives the same row order
   rubric: rubric/rubric.md                # shown in the labelling app
 
