@@ -8,8 +8,9 @@ __pycache__/
 .venv/
 .pytest_cache/
 
-# promptfoo cache
+# promptfoo cache and raw output (rule_hits.csv keeps the results)
 .promptfoo/
+promptfoo/results.json
 
 # dbt
 target/

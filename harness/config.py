@@ -46,6 +46,13 @@ class Leaflet(_Strict):
     prepared: str
 
 
+class RuleChecksConfig(_Strict):
+    promptfoo_version: str
+    promptfoo_config: Path
+    promptfoo_results: Path
+    hits: Path
+
+
 class Paths(_Strict):
     cases: Path
     sources: Path
@@ -57,6 +64,7 @@ class Config(_Strict):
     cost: CostConfig
     generate: GenerateConfig
     leaflets: list[Leaflet]
+    rule_checks: RuleChecksConfig
     paths: Paths
 
     def resolve(self, root: Path) -> "Config":
@@ -68,6 +76,9 @@ class Config(_Strict):
         for leaflet in c.leaflets:
             leaflet.path = root / leaflet.path
         c.paths = Paths(**{k: root / p for k, p in c.paths.model_dump().items()})
+        rc = c.rule_checks
+        rc.promptfoo_config, rc.promptfoo_results, rc.hits = (
+            root / rc.promptfoo_config, root / rc.promptfoo_results, root / rc.hits)
         return c
 
 

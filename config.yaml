@@ -30,6 +30,12 @@ leaflets:
     path: data/leaflets/MJ_CMI.txt
     prepared: "2026-09"
 
+rule_checks:
+  promptfoo_version: "0.124.0"            # pinned so results are repeatable
+  promptfoo_config: promptfoo/promptfooconfig.yaml   # generated; do not edit by hand
+  promptfoo_results: promptfoo/results.json
+  hits: runs/rule_hits.csv                # append-only
+
 paths:
   cases: data/test_cases.csv
   sources: data/sources.md

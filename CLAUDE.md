@@ -70,4 +70,5 @@ Update this line at the end of every session.
 
 - **Done:** Stage 1 (test set, rubric, validator); Stage 1b (73 cases, 50 dev / 23 locked; coaching + adversarial added; style variants, over-safety, trial claims cut)
 - **Done:** Stage 2 (generator, Claude Haiku 4.5 bot, grounded_v2 prompt, first full run A$1.87)
-- **Next:** Stage 3 (rule checks in promptfoo). Still open from 1b: check DIET_GUIDE content in `data/sources.md`
+- **Done:** Stage 3 (rule checks via promptfoo 0.124.0; require-only rules on 25 dev cases; run 20261007T061343Z-71f54e: 15 fails, all bare, grounded all pass)
+- **Next:** Stage 4 (blind gold labels + labelling script). Still open: check DIET_GUIDE content in `data/sources.md`; MD-01-CO and CO-06 have no answers yet (need a generate run); PC-01 forbid has a garbled apostrophe (`don�t stop`)
