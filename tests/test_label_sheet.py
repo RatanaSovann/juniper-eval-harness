@@ -4,7 +4,7 @@ import csv
 import pytest
 
 from harness.label_sheet import (LABEL_COLUMNS, SHEET_COLUMNS, build_rows, is_labelled, read_sheet, save_sheet,
-                                 set_labels, write_sheet)
+                                 leaflet_sections, set_labels, source_excerpts, write_sheet)
 from harness.models import TestCase
 from tests.test_rule_checks import answer
 from tests.test_validate_cases import GOOD
@@ -95,3 +95,34 @@ def test_read_sheet_rejects_wrong_columns(tmp_path):
     path.write_text("case_id,answer\nMD-01,x\n", encoding="utf-8")
     with pytest.raises(ValueError):
         read_sheet(path)
+
+
+LEAFLET = """# Wegovy
+### 1. Why?
+summary one
+### 4. How?
+summary four
+# Wegovy full CMI
+### 1. Why?
+full one
+### 4. How?
+full four
+#### Missed dose
+skip it after 5 days
+### 5. While using?
+full five
+"""
+
+
+def test_leaflet_sections_keep_the_full_version_with_subsections():
+    s = leaflet_sections(LEAFLET)
+    assert s[1] == "### 1. Why?\nfull one"
+    assert s[4] == "### 4. How?\nfull four\n#### Missed dose\nskip it after 5 days"
+    assert s[5] == "### 5. While using?\nfull five"
+
+
+def test_source_excerpts_handles_several_sources_and_missing_ones():
+    out = source_excerpts("WEG_CMI s4 s9; JUNIPER_FAQ", {"WEG_CMI": LEAFLET})
+    assert [t for t, _ in out] == ["WEG_CMI s4", "WEG_CMI s9", "JUNIPER_FAQ"]
+    assert out[0][1].startswith("### 4. How?")
+    assert "sources.md" in out[1][1] and "sources.md" in out[2][1]

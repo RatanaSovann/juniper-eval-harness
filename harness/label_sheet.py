@@ -11,6 +11,7 @@ import argparse
 import csv
 import os
 import random
+import re
 import sys
 
 from harness.config import load_config
@@ -85,6 +86,37 @@ def save_sheet(path, rows: list[dict]) -> None:
         w.writeheader()
         w.writerows(rows)
     os.replace(tmp, path)
+
+
+def leaflet_sections(text: str) -> dict[int, str]:
+    """Split a CMI leaflet into its numbered sections, e.g. {4: '### 4. How do I use...'}.
+
+    Each leaflet has a short summary followed by the full CMI with the same headings;
+    the full version (the later one) is kept.
+    """
+    sections = {}
+    for m in re.finditer(r"^### (\d+)\. .*?(?=^#{1,3} |\Z)", text, flags=re.MULTILINE | re.DOTALL):
+        sections[int(m.group(1))] = m.group(0).strip()
+    return sections
+
+
+def source_excerpts(source_ref: str, leaflets: dict[str, str]) -> list[tuple[str, str]]:
+    """Turn a source_ref like 'MJ_CMI s6; WEG_CMI s2 s6' into (title, text) pairs to show.
+
+    Sources that aren't leaflets (e.g. JUNIPER_FAQ), or sections that can't be found,
+    come back with a pointer to data/sources.md instead of text.
+    """
+    out = []
+    for part in source_ref.split(";"):
+        key, *secs = part.split()
+        if key not in leaflets or not secs:
+            out.append((part.strip(), "No text in the app: see data/sources.md"))
+            continue
+        sections = leaflet_sections(leaflets[key])
+        for s in secs:
+            n = int(s.lstrip("s")) if s.lstrip("s").isdigit() else None
+            out.append((f"{key} {s}", sections.get(n, "Section not found: see data/sources.md")))
+    return out
 
 
 def is_labelled(row: dict) -> bool:
