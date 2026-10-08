@@ -71,4 +71,5 @@ Update this line at the end of every session.
 - **Done:** Stage 1 (test set, rubric, validator); Stage 1b (73 cases, 50 dev / 23 locked; coaching + adversarial added; style variants, over-safety, trial claims cut)
 - **Done:** Stage 2 (generator, Claude Haiku 4.5 bot, grounded_v2 prompt, first full run A$1.87)
 - **Done:** Stage 3 (rule checks via promptfoo 0.124.0; require-only rules on 25 dev cases; run 20261007T061343Z-71f54e: 15 fails, all bare, grounded all pass)
-- **Next:** Stage 4 (blind gold labels + labelling script). Still open: check DIET_GUIDE content in `data/sources.md`; MD-01-CO and CO-06 have no answers yet (need a generate run); PC-01 forbid has a garbled apostrophe (`don�t stop`)
+- **Done:** Stage 4 tooling (blind label sheet from run 20261007T061343Z-71f54e, 130 answers, both partitions; Streamlit app `streamlit run harness/label_app.py`). Stage 6 plan now includes a `--compare` routing backtest
+- **Next:** finish labelling (2 / 130 at commit), then Stage 5 (two judges + kappa on dev). Still open: check DIET_GUIDE content in `data/sources.md`; the 8 coaching-scope cases (incl. MD-01-CO, CO-06) have no answers until a coaching prompt exists (`generate.scopes`); PC-01 forbid has a garbled apostrophe (`don�t stop`)

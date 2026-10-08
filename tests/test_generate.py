@@ -45,6 +45,7 @@ def make_config(tmp_path, cap=5.0, prompt=True):
         "leaflets": [{"key": "WEG_CMI", "path": "leaflet.txt", "prepared": "2026-07"}],
         "rule_checks": {"promptfoo_version": "0.0.0", "promptfoo_config": "pf/config.yaml",
                         "promptfoo_results": "pf/results.json", "hits": "runs/rule_hits.csv"},
+        "labels": {"sheet": "labels/label_sheet.csv", "shuffle_seed": 1, "rubric": "rubric.md"},
         "paths": {"cases": "cases.csv", "sources": "sources.md", "answers": "runs/answers.jsonl"},
     }
     (tmp_path / "config.yaml").write_text(yaml.safe_dump(cfg), encoding="utf-8")

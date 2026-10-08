@@ -36,6 +36,11 @@ rule_checks:
   promptfoo_results: promptfoo/results.json
   hits: runs/rule_hits.csv                # append-only
 
+labels:
+  sheet: data/labels/label_sheet.csv      # your blind labels; never overwritten by the harness
+  shuffle_seed: 20261008                  # fixed so the same run always gives the same row order
+  rubric: rubric/rubric.md                # shown in the labelling app
+
 paths:
   cases: data/test_cases.csv
   sources: data/sources.md

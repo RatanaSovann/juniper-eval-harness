@@ -53,6 +53,12 @@ class RuleChecksConfig(_Strict):
     hits: Path
 
 
+class LabelsConfig(_Strict):
+    sheet: Path
+    shuffle_seed: int
+    rubric: Path
+
+
 class Paths(_Strict):
     cases: Path
     sources: Path
@@ -65,6 +71,7 @@ class Config(_Strict):
     generate: GenerateConfig
     leaflets: list[Leaflet]
     rule_checks: RuleChecksConfig
+    labels: LabelsConfig
     paths: Paths
 
     def resolve(self, root: Path) -> "Config":
@@ -79,6 +86,7 @@ class Config(_Strict):
         rc = c.rule_checks
         rc.promptfoo_config, rc.promptfoo_results, rc.hits = (
             root / rc.promptfoo_config, root / rc.promptfoo_results, root / rc.hits)
+        c.labels.sheet, c.labels.rubric = root / c.labels.sheet, root / c.labels.rubric
         return c
 
 
