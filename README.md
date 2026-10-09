@@ -13,7 +13,6 @@ Early pilot: two of the three AI judges I tried marked a dangerous answer as saf
 > **Not medical advice.** Expected answers come from public consumer medicine leaflets, written by a data scientist, not a clinician.
 >
 > **No patient data.** Every test case cites a public source in `data/sources.md`.
->
 
 
 ## How it works
