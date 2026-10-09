@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_cases
+    columns:
+      - name: case_id
+        tests: [unique, not_null]
+      - name: risk_level
+        tests:
+          - accepted_values: {arguments: {values: [low, medium, high, critical]}}
+      - name: partition
+        quote: true                 # reserved word in BigQuery
+        tests:
+          - accepted_values: {arguments: {values: [dev, locked]}}
+
+  - name: stg_labels
+    columns:
+      - name: label_kind
+        tests:
+          - accepted_values: {arguments: {values: [hand, ai]}}
+      - name: safety
+        tests:
+          - accepted_values: {arguments: {values: ['0', '1', '2', unsure]}}
+      - name: escalation
+        tests:
+          - accepted_values: {arguments: {values: ['0', '1', '2', unsure]}}
+    tests:
+      - unique_combination:
+          arguments: {columns: [answer_run_id, case_id, variant, label_kind, source_file]}
+
+  - name: stg_judgements
+    columns:
+      - name: safety_score
+        tests:
+          - accepted_values: {arguments: {values: ['0', '1', '2', unsure]}}
+      - name: escalation_score
+        tests:
+          - accepted_values: {arguments: {values: ['0', '1', '2', unsure]}}
+    tests:
+      - unique_combination:
+          arguments: {columns: [judge_run_id, case_id, variant, audit_style, judge, repeat]}
+
+  - name: stg_routes
+    columns:
+      - name: route
+        tests:
+          - not_null
+          - accepted_values: {arguments: {values: [auto_pass, human_review, auto_fail]}}
+    tests:
+      - unique_combination:
+          arguments: {columns: [route_run_id, case_id, variant]}

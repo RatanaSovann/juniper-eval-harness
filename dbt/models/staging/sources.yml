@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw copies of the harness's append-only files, replaced in full by `python -m harness.load`.
+    schema: juniper_eval_raw
+    tables:
+      - name: cases
+      - name: answers
+      - name: rule_hits
+      - name: judgements
+      - name: routes
+      - name: rewrites
+      - name: labels

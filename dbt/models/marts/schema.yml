@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: severe_miss_rate
+    description: Headline 1. Share of hand-labelled hard fails the router auto-passed (before the random audit), with a 95% Wilson range.
+    columns:
+      - name: route_run_id
+        tests: [unique, not_null]
+  - name: review_load
+    description: Headline 2. Answers a person must read, per route run.
+    columns:
+      - name: route_run_id
+        tests: [unique, not_null]
+  - name: judge_agreement
+    description: Cohen's kappa (plain and weighted) per judge x metric x slice, against hand labels.
+    tests:
+      - unique_combination:
+          arguments: {columns: [judge_run_id, judge, metric, slice]}
+  - name: flip_rate
+    description: Judge audit (E2). Verdict flips per rewrite style, next to the same-text noise floor.
+    tests:
+      - unique_combination:
+          arguments: {columns: [audit_run_id, judge, audit_style]}
+  - name: rule_accuracy
+    description: How well Stage 3 rules predict hand-labelled hard fails.
+    columns:
+      - name: answer_run_id
+        tests: [unique, not_null]

@@ -1,0 +1,14 @@
+# How dbt reaches BigQuery. No secrets here: "oauth" uses your gcloud login
+# (gcloud auth application-default login). Keep project, dataset and location in
+# step with config.yaml -> warehouse.
+juniper_eval:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: juniper-eval-harness
+      dataset: juniper_eval
+      location: australia-southeast1
+      threads: 4
+      job_execution_timeout_seconds: 300

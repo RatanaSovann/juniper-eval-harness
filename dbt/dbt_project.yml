@@ -1,0 +1,15 @@
+# dbt turns the raw tables (loaded by `python -m harness.load`) into the scorecard.
+# Run from this folder:  dbt build   (builds every model and runs every test)
+name: juniper_eval
+version: "1.0.0"
+config-version: 2
+profile: juniper_eval
+
+model-paths: ["models"]
+
+models:
+  juniper_eval:
+    staging:
+      +materialized: view     # cleaned-up copies of the raw tables; cheap, always current
+    marts:
+      +materialized: table    # the scorecard tables

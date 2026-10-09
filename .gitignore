@@ -23,3 +23,6 @@ Thumbs.db
 
 # pip install -e . metadata
 *.egg-info/
+
+# dbt: anonymous per-machine id
+.user.yml
