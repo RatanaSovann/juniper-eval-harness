@@ -5,6 +5,7 @@ Run:  python -m harness.judge --limit 2      (first 2 answers, every judge, ever
       python -m harness.judge --resume <judge_run_id>   (finish a run that stopped part-way)
       python -m harness.judge --only gemini             (one judge only, e.g. after changing its model)
       python -m harness.judge --labelled                (only answers you have hand-labelled)
+      python -m harness.judge --partition locked        (the locked set, once, at the end)
 
 Each judge scores each answer judge.repeats times, so you can see whether it agrees with
 itself. Busy-server errors (429/5xx) are retried by the SDKs with growing waits. Unusable JSON gets one retry, then the verdict is logged as "invalid". Scores are
@@ -285,11 +286,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--limit", type=int, help="only the first N answers")
     parser.add_argument("--resume", metavar="JUDGE_RUN_ID", help="finish a run that stopped part-way")
     parser.add_argument("--labelled", action="store_true", help="only answers with a full hand label")
+    parser.add_argument("--partition", choices=["dev", "locked"],
+                        help="which cases to judge (default: judge.partition). Locked is for measuring only, never tuning")
     parser.add_argument("--only", nargs="+", metavar="NAME", help="run only these judges, e.g. --only gemini")
     args = parser.parse_args(argv)
 
     load_dotenv(ROOT / ".env")
     config = load_config()
+    if args.partition:
+        config.judge.partition = args.partition
     if args.only:
         names = {j.name for j in config.judge.judges}
         if unknown := set(args.only) - names:

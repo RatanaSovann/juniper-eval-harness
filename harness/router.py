@@ -240,8 +240,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--rules", type=Path, help="policy file (default: router.rules in config.yaml)")
     parser.add_argument("--compare", nargs=2, type=Path, metavar=("OLD", "NEW"), help="backtest two policy files")
     parser.add_argument("--partition", choices=["dev", "locked"], default="dev")
+    parser.add_argument("--judge-run", metavar="JUDGE_RUN_ID",
+                        help="read every judge's verdicts from this judge run (default: router.judge_runs)")
     args = parser.parse_args(argv)
     config = load_config()
+    if args.judge_run:
+        config.router.judge_runs = {name: args.judge_run for name in config.router.judge_runs}
     try:
         if args.compare:
             print(compare(config, *args.compare, partition=args.partition))

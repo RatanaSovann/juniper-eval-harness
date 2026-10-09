@@ -164,3 +164,13 @@ def test_real_policy_file_loads():
     rules = load_rules(load_config().router.rules)
     assert rules.default == "auto_pass" and not any(r.then == "auto_fail" for r in rules.rules)
     assert rules.rules[0].name == "no_verdict"  # a missing verdict must never fall through to auto_pass
+
+
+def test_judge_run_flag_points_every_judge_at_one_run(monkeypatch):
+    from harness import router
+
+    seen = {}
+    monkeypatch.setattr(router, "route", lambda config, rules, partition: seen.update(
+        runs=config.router.judge_runs, partition=partition) or ("R", []))
+    assert router.main(["--partition", "locked", "--judge-run", "J-LOCKED"]) == 0
+    assert seen["partition"] == "locked" and set(seen["runs"].values()) == {"J-LOCKED"}
