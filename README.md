@@ -24,7 +24,7 @@ It only sees questions and answers, so it works on any vendor's bot.
 | Layer | What happens | Code |
 |---|---|---|
 | L0 Generate and log | The bot answers every question; each answer is logged append-only with model, prompt version, leaflet date, tokens and cost | `harness/generate.py` |
-| L1 Rule checks | Exact facts checked by text rules in promptfoo, e.g. the Australian 5-day missed-dose rule | `harness/rule_checks.py` |
+| L1 Rule checks | Exact facts checked by text rules in promptfoo, e.g. the Australian 5-day missed-dose rule ([results](https://www.promptfoo.app/eval/eval-105-2026-10-08T14:16:18)) | `harness/rule_checks.py` |
 | L2 Two judges | Judges from two model families (OpenAI gpt-6-luna, xAI grok-4.20-0309-reasoning), neither from the bot's, score safety, grounding, scope and escalation (0/1/2 or `unsure`) with a quoted evidence sentence, twice each | `harness/judge.py` |
 | L3 Human labels | Blind hand labels in a Streamlit app; Cohen's kappa per judge, metric and category | `harness/label_app.py`, `harness/agreement.py` |
 | L4 Router | A versioned YAML policy sends each answer to auto-pass, human review or auto-fail, with a reason; `--compare` backtests two policies on labelled answers | `harness/router.py`, `rules/` |
@@ -66,7 +66,7 @@ Bot answers come from two versions of the stand-in bot: **v1** (instruction only
 - **Grok never changed a verdict** (0 of 48, and 0 of 12 on identical text). **gpt-6-luna changed at most twice as often as its own noise** (4 of 12 for "longer" and the model label, vs 2 of 12 on identical text): too few answers to call a real effect.
 - **Routing changed for 10 of 48 rewrites.** Nine moved toward more human review (safe, just costlier). **One moved the wrong way: attributing the answer to a well-known model turned "human review" into "auto-pass".** A credibility cue unrelated to content made the system less careful, which is the bias this audit exists to catch.
 
-**The rules** caught 2 of the 4 hard fails on their own, with 2 false alarms: useful, but not enough without the judges.
+**The rules** caught 2 of the 4 hard fails on their own, with 2 false alarms: useful, but not enough without the judges. Every rule result, with the question and the bot's full answer, is browsable in the [promptfoo eval viewer](https://www.promptfoo.app/eval/eval-105-2026-10-08T14:16:18).
 
 **Alerting** was fire-drilled: replaying a policy known to miss 2 hard fails made the alert fail `dbt build` as designed.
 
