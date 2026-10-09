@@ -1,4 +1,4 @@
-# CLAUDE.md — Juniper AI Answer Eval Harness
+# CLAUDE.md — GLP-1 AI Answer Eval Harness
 
 Read this first, every session. It sets how we work in this repo.
 

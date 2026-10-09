@@ -1,5 +1,5 @@
 [project]
-name = "juniper-eval-harness"
+name = "glp1-eval-harness"
 version = "0.1.0"
 description = "Independent eval harness for AI answers to Australian GLP-1 patient questions"
 requires-python = ">=3.11"

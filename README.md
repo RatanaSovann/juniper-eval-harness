@@ -1,4 +1,4 @@
-# Juniper AI Answer Eval Harness
+# GLP-1 AI Answer Eval Harness
 
 **Can you trust an AI to check another AI's medical answers?** This project tests that, on questions an Australian patient taking Wegovy or Mounjaro might ask.
 

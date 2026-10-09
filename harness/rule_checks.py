@@ -71,7 +71,7 @@ def build_promptfoo_config(cases: list[TestCase], answers: list[LoggedAnswer]) -
             "assert": asserts,
         })
     return {
-        "description": "Juniper eval harness: L1 rule checks on saved answers (generated, do not edit)",
+        "description": "GLP-1 eval harness: L1 rule checks on saved answers (generated, do not edit)",
         "prompts": ["{{answer}}"],
         "providers": ["echo"],
         "tests": tests,
