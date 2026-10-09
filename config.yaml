@@ -69,7 +69,8 @@ router:
   rules: rules/routing_v2.yaml           # your policy (v2 adopted 09 Oct 2026); reasoning in docs/routing_rules.md
   judge_runs:                             # whose verdicts the router reads; answers come from judge.answers_run
     openai: 20261009T001243Z-ff6b22       # gpt-6-luna, all 88 dev answers
-    gemini: 20261009T001243Z-ff6b22       # gemini-3.5-flash-lite; swap for "grok: <judge_run_id>" once Grok has judged all dev answers
+    grok: 20261009T030812Z-16238e         # grok-4.20-0309-reasoning, all 88 dev answers (replaced flash-lite 9 Oct 2026;
+                                          # backtest: same review load, 0 misses either way)
 
 audit:                                    # Stage 6 judge audit (experiment E2): measurement only, never tuning
   partition: locked
@@ -84,7 +85,7 @@ audit:                                    # Stage 6 judge audit (experiment E2):
     price_usd_per_mtok:                   # Anthropic list price, checked 9 Oct 2026
       input: 2.00
       output: 10.00
-  judges:                                 # the pair the router will use once Grok has judged the dev answers
+  judges:                                 # the pair the router uses
     - name: openai
       provider: openai
       model: gpt-6-luna
