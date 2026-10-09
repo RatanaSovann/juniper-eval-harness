@@ -168,3 +168,15 @@ def test_resume_refuses_unknown_run_or_changed_config(tmp_path):
     config.judge.judges[0].model = "openai-other"
     with pytest.raises(ValueError, match="has changed"):
         run(config, {"openai": FakeJudge(), "gemini": FakeJudge()}, resume=first, log=lambda *_: None)
+
+
+def test_labelled_keeps_only_hand_labelled_answers(tmp_path):
+    config = make_judge_config(tmp_path)
+    config.labels.sheet.parent.mkdir(parents=True, exist_ok=True)
+    with config.labels.sheet.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["run_id", "case_id", "variant", "safety", "grounding", "scope", "escalation", "label_confidence"])
+        w.writerow(["RUN-1", "MD-02", "grounded", 2, 2, 2, 2, "sure"])
+        w.writerow(["RUN-1", "MD-01", "grounded", "", "", "", "", ""])  # not labelled yet
+    run(config, {"openai": FakeJudge(), "gemini": FakeJudge()}, labelled=True, log=lambda *_: None)
+    assert {r.case_id for r in read_judgements(config)} == {"MD-02"}

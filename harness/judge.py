@@ -3,6 +3,8 @@
 Run:  python -m harness.judge --limit 2      (first 2 answers, every judge, every repeat)
       python -m harness.judge                (every answer in judge.answers_run and judge.partition)
       python -m harness.judge --resume <judge_run_id>   (finish a run that stopped part-way)
+      python -m harness.judge --only gemini             (one judge only, e.g. after changing its model)
+      python -m harness.judge --labelled                (only answers you have hand-labelled)
 
 Each judge scores each answer judge.repeats times, so you can see whether it agrees with
 itself. Busy-server errors (429/5xx) are retried by the SDKs with growing waits. Unusable JSON gets one retry, then the verdict is logged as "invalid". Scores are
@@ -19,6 +21,7 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
+from harness.agreement import load_labels
 from harness.config import ROOT, Config, JudgeModel, load_config
 from harness.generate import ChatModel, Completion, CostCapReached, cost_aud, worst_case_aud
 from harness.models import Judgement, JudgeScores, LoggedAnswer, TestCase
@@ -132,19 +135,26 @@ def parse_scores(text: str) -> JudgeScores | None:
         return None
 
 
-def select_answers(config: Config, limit: int | None) -> list[tuple[LoggedAnswer, TestCase]]:
-    """Answers from judge.answers_run whose case is in judge.partition, in log order."""
+def select_answers(config: Config, limit: int | None, labelled: bool = False) -> list[tuple[LoggedAnswer, TestCase]]:
+    """Answers from judge.answers_run whose case is in judge.partition, in log order.
+
+    labelled=True keeps only answers fully hand-labelled in labels.sheet, the ones the
+    agreement report compares against.
+    """
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
         raise ValueError("Test set has problems; run python -m harness.validate_cases")
     by_id = {c.case_id: c for c in cases if c.partition == config.judge.partition}
+    keep = load_labels(config.labels.sheet, config.judge.answers_run, set(by_id)) if labelled else None
     picked = []
     for line in config.paths.answers.read_text(encoding="utf-8").splitlines():
         a = LoggedAnswer(**json.loads(line))
-        if a.run_id == config.judge.answers_run and a.case_id in by_id:
+        if a.run_id == config.judge.answers_run and a.case_id in by_id and (
+                keep is None or (a.case_id, a.variant) in keep):
             picked.append((a, by_id[a.case_id]))
     if not picked:
-        raise ValueError(f"No {config.judge.partition} answers found for run {config.judge.answers_run}")
+        raise ValueError(f"No {'labelled ' if labelled else ''}{config.judge.partition} answers "
+                         f"found for run {config.judge.answers_run}")
     return picked[:limit] if limit else picked
 
 
@@ -170,7 +180,7 @@ def load_resume(config: Config, judge_run_id: str) -> tuple[set[tuple], float]:
 
 
 def run(config: Config, models: dict[str, ChatModel], limit: int | None = None, log=print,
-        resume: str | None = None) -> tuple[str, int, float]:
+        resume: str | None = None, labelled: bool = False) -> tuple[str, int, float]:
     """Score each selected answer with each judge, judge.repeats times, appending one line per verdict.
 
     models maps judge name -> model. resume is a judge_run_id to finish: its saved verdicts are
@@ -178,7 +188,7 @@ def run(config: Config, models: dict[str, ChatModel], limit: int | None = None, 
     AUD spent by the run in total). Raises CostCapReached if the next call could exceed the
     cap; verdicts already written stay.
     """
-    answers = select_answers(config, limit)
+    answers = select_answers(config, limit, labelled)
     if resume:
         judge_run_id = resume
         done, spent = load_resume(config, resume)
@@ -253,17 +263,25 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--limit", type=int, help="only the first N answers")
     parser.add_argument("--resume", metavar="JUDGE_RUN_ID", help="finish a run that stopped part-way")
+    parser.add_argument("--labelled", action="store_true", help="only answers with a full hand label")
+    parser.add_argument("--only", nargs="+", metavar="NAME", help="run only these judges, e.g. --only gemini")
     args = parser.parse_args(argv)
 
     load_dotenv(ROOT / ".env")
     config = load_config()
+    if args.only:
+        names = {j.name for j in config.judge.judges}
+        if unknown := set(args.only) - names:
+            print(f"Unknown judge(s) {sorted(unknown)}; config.yaml has {sorted(names)}. Nothing was sent.")
+            return 1
+        config.judge.judges = [j for j in config.judge.judges if j.name in args.only]
     problems = setup_problems(config)
     if problems:
         print("Not ready, nothing was sent:\n  " + "\n  ".join(problems))
         return 1
     try:
         models = {j.name: PROVIDERS[j.provider](j) for j in config.judge.judges}
-        run(config, models, args.limit, resume=args.resume)
+        run(config, models, args.limit, resume=args.resume, labelled=args.labelled)
     except (ValueError, CostCapReached) as e:
         print(e)
         return 1

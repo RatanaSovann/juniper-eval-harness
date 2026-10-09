@@ -57,12 +57,12 @@ judge:
         output: 0.50
     - name: gemini
       provider: gemini                    # key from GEMINI_API_KEY
-      model: gemini-3.5-flash-lite        # Google's newest small tier
+      model: gemini-3.8-flash             # was gemini-3.5-flash-lite (missed every hard fail, run 20261009T001243Z-ff6b22)
       temperature: null                   # provider default
-      max_tokens: 4000
-      price_usd_per_mtok:                 # Google list price incl. thinking tokens, checked 9 Oct 2026
-        input: 0.30
-        output: 2.50
+      max_tokens: 8000                    # thinks ~2.5k tokens per verdict; headroom so JSON is never cut off
+      price_usd_per_mtok:                 # Google list price incl. thinking tokens, checked 9 Oct 2026; doubles from 1 Jan 2027
+        input: 0.75
+        output: 3.75
 
 paths:
   cases: data/test_cases.csv
