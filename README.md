@@ -14,6 +14,12 @@ Early pilot: two of the three AI judges I tried marked a dangerous answer as saf
 >
 > **No patient data.** Every test case cites a public source in `data/sources.md`.
 
+## Dashboard
+
+**[Open the GLP-1 Answer Safety Scorecard →](https://claude.ai/artifact/XXNzQEJBLDMAQMcLgmMxFS)**
+
+The front view shows the headline results: dangerous answers that skipped review, how many answers a person had to read, how many hard fails each judge and the word checks caught, and whether the results hold on the locked test set. Below that are seven real answers, case by case ([e.g. MD-01](https://claude.ai/artifact/XXNzQEJBLDMAQMcLgmMxFS#case-md-01-v2)). Each one shows the question, the bot's reply, every rule result, both judges' scores, the route and my hand label. Click a judge's score to highlight the sentence it quoted as evidence.
+
 
 ## How it works
 
