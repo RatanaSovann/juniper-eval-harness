@@ -26,3 +26,6 @@ Thumbs.db
 
 # dbt: anonymous per-machine id
 .user.yml
+
+# dagster dev scratch folder
+.tmp_dagster_home_*/

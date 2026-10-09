@@ -92,6 +92,8 @@ API keys go in a `.env` file (git-ignored): `ANTHROPIC_API_KEY` (bot, rewriter),
 | Backtest two policies | `python -m harness.router --compare rules/routing_v1.yaml rules/routing_v2.yaml` |
 | Judge audit | `python -m harness.audit`, then `python -m harness.audit --report` |
 | Load into BigQuery | `python -m harness.load` (`--dry-run` to preview); needs `gcloud auth application-default login` |
+| Build the scorecard | `cd dbt; dbt build` (6 views, 5 scorecard tables, 22 data tests) |
+| Pipeline UI | `dagster dev -m harness.pipeline`: `refresh_scorecard` (free) and `full_eval` (paid, about A$5; weekly schedule off by default) |
 
 ## Repo map
 
