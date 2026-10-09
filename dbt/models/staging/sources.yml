@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: raw
     description: Raw copies of the harness's append-only files, replaced in full by `python -m harness.load`.
-    schema: juniper_eval_raw
+    schema: "{{ var('raw_dataset', 'juniper_eval_raw') }}"   # --vars to point at another raw dataset (fire drill)
     tables:
       - name: cases
       - name: answers

@@ -26,3 +26,8 @@ models:
     columns:
       - name: answer_run_id
         tests: [unique, not_null]
+  - name: scorecard_alerts
+    description: One row per alert check per route run (error = hard fail auto-passed; warning = review load jumped > 10 points). The tests in tests/ act on the latest run only.
+    tests:
+      - unique_combination:
+          arguments: {columns: [route_run_id, check_name]}
