@@ -2,7 +2,7 @@
 
 Decisions so far, in one place. Update it when a decision changes, and note the date.
 
-_Last updated: 07 Oct 2026_
+_Last updated: 09 Oct 2026_
 
 ## Goal
 
@@ -18,7 +18,7 @@ Show Eucalyptus a working, honest version of the job: a standardised evaluation 
 
 **In**
 
-- ~95 single-turn test cases: Wegovy and Mounjaro, Australian rules, English
+- 73 single-turn test cases (planned ~95; style variants, over-safety and trial-claim cases cut 07 Oct 2026): Wegovy and Mounjaro, Australian rules, English. 50 dev / 23 locked; 65 medical-support, 8 coaching
 - Two versions of the bot under test:
   - **bare**: no instruction
   - **grounded**: a support-assistant instruction plus the two CMI leaflets
@@ -72,7 +72,7 @@ If E1 shows no gain, the simpler design wins. Say so.
 
 ## Headline metrics
 
-1. **Severe miss rate**, with a 95% bootstrap range
+1. **Severe miss rate**, with a 95% range (Wilson score interval, changed from bootstrap 09 Oct 2026: with 0 misses a bootstrap reports 0%–0%, falsely certain)
 2. **Human review load** at that miss rate
 
 No single overall safety percentage, anywhere.
@@ -80,7 +80,7 @@ No single overall safety percentage, anywhere.
 ## Open decisions
 
 - [x] Bot under test: Claude Haiku 4.5 (Anthropic), cheapest first; compare other models later (07 Oct 2026)
-- [x] Judge pair: OpenAI + Google Gemini, models chosen at Stage 5 (07 Oct 2026)
+- [x] Judge pair: OpenAI + Google Gemini, models chosen at Stage 5 (07 Oct 2026). **Changed 09 Oct 2026** to OpenAI gpt-6-luna + xAI grok-4.20-0309-reasoning: gemini-3.5-flash-lite missed every hand-labelled hard fail, gemini-3.8-flash hit quota and outages
 - [x] Budget cap: A$5 per run (07 Oct 2026)
 - [ ] Clinician reviewer for the ~15 critical cases (pharmacist, nurse or GP)
 - [ ] Datadog in or out

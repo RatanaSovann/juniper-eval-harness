@@ -2,10 +2,10 @@ version: 2
 
 models:
   - name: severe_miss_rate
-    description: Headline 1. Share of hand-labelled hard fails the router auto-passed (before the random audit), with a 95% Wilson range.
-    columns:
-      - name: route_run_id
-        tests: [unique, not_null]
+    description: Headline 1. Share of labelled hard fails the router auto-passed (before the random audit), with a 95% Wilson range, per label kind (hand / ai).
+    tests:
+      - unique_combination:
+          arguments: {columns: [route_run_id, label_kind]}
   - name: review_load
     description: Headline 2. Answers a person must read, per route run.
     columns:

@@ -4,8 +4,8 @@ Run:  streamlit run harness/label_app.py
 
 Reads and writes data/labels/label_sheet.csv (path from config.yaml). It shows only what is
 on the sheet plus the leaflet section its source_ref names, so no rule-check or judge results
-can leak in. The sidebar can narrow the rows to dev cases at chosen risk levels; the partition
-and risk level are used to filter, never shown. Nothing leaves your machine.
+can leak in. The sidebar can narrow the rows to dev or locked cases at chosen risk levels; the
+partition and risk level are used to filter, never shown. Nothing leaves your machine.
 """
 import sys
 from pathlib import Path
@@ -47,14 +47,16 @@ leaflets = {l.key: l.path.read_text(encoding="utf-8") for l in config.leaflets}
 with st.sidebar:
     st.header("Which answers")
     show_all = st.toggle("All answers", value=False)
-    risks = st.multiselect("Dev cases at risk level", RISK_LEVELS, default=["critical", "high"], disabled=show_all)
+    partition = st.radio("Cases", ["dev", "locked"], horizontal=True, disabled=show_all,
+                         help="Locked cases are the final test set: label them before seeing any judge results.")
+    risks = st.multiselect("At risk level", RISK_LEVELS, default=["critical", "high"], disabled=show_all)
 order = [i for i, r in enumerate(rows)
-         if show_all or (cases[r["case_id"]].partition == "dev" and cases[r["case_id"]].risk_level in risks)]
+         if show_all or (cases[r["case_id"]].partition == partition and cases[r["case_id"]].risk_level in risks)]
 if not order:
     st.info("No answers match the sidebar filter.")
     st.stop()
-if st.session_state.get("filter") != (show_all, tuple(risks)):  # filter changed: restart at first unlabelled
-    st.session_state.filter = (show_all, tuple(risks))
+if st.session_state.get("filter") != (show_all, partition, tuple(risks)):  # filter changed: restart at first unlabelled
+    st.session_state.filter = (show_all, partition, tuple(risks))
     st.session_state.pos = next_unlabelled(rows, order, -1) or 0
 pos = min(st.session_state.pos, len(order) - 1)
 row = rows[order[pos]]
