@@ -12,7 +12,7 @@
 >
 > **No patient data.** Every test case cites a public source in `data/sources.md`.
 >
-> **Not affiliated with Eucalyptus or Juniper.** The bot under test is a stand-in (Claude Haiku 4.5 with my own instructions).
+
 
 ## How it works
 
