@@ -55,20 +55,56 @@ judge:
       price_usd_per_mtok:                 # OpenAI list price, checked 9 Oct 2026
         input: 0.10
         output: 0.50
-    - name: gemini
-      provider: gemini                    # key from GEMINI_API_KEY
-      model: gemini-3.8-flash             # was gemini-3.5-flash-lite (missed every hard fail, run 20261009T001243Z-ff6b22)
-      temperature: null                   # provider default
-      max_tokens: 8000                    # thinks ~2.5k tokens per verdict; headroom so JSON is never cut off
-      price_usd_per_mtok:                 # Google list price incl. thinking tokens, checked 9 Oct 2026; doubles from 1 Jan 2027
-        input: 0.75
-        output: 3.75
+    - name: grok
+      provider: xai                       # key from XAI_API_KEY; OpenAI-compatible API at api.x.ai
+      model: grok-4.20-0309-reasoning     # dated snapshot, so it can't change underneath us. Replaced Gemini (9 Oct 2026):
+                                          # flash-lite missed every hard fail; 3.8-flash hit free-tier quota and 503s
+      temperature: null                   # reasoning model: provider default
+      max_tokens: 8000                    # reasoning tokens count as output; headroom so JSON is never cut off
+      price_usd_per_mtok:                 # xAI list price (prompts under 200k tokens), checked 9 Oct 2026
+        input: 1.25
+        output: 2.50
 
 router:
   rules: rules/routing_v2.yaml           # your policy (v2 adopted 09 Oct 2026); reasoning in docs/routing_rules.md
   judge_runs:                             # whose verdicts the router reads; answers come from judge.answers_run
     openai: 20261009T001243Z-ff6b22       # gpt-6-luna, all 88 dev answers
-    gemini: 20261009T001243Z-ff6b22       # gemini-3.5-flash-lite (3.8-flash run only covers labelled answers, unfinished)
+    gemini: 20261009T001243Z-ff6b22       # gemini-3.5-flash-lite; swap for "grok: <judge_run_id>" once Grok has judged all dev answers
+
+audit:                                    # Stage 6 judge audit (experiment E2): measurement only, never tuning
+  partition: locked
+  risk_levels: [critical]
+  styles: [longer, shorter, politer, other_model]
+  repeats: 2                              # repeats give the noise floor: how often a judge flips on identical text
+  rewriter:
+    provider: anthropic
+    model: claude-sonnet-5-5              # not one of the judges; refusal fallback "default" is on
+    temperature: null                     # Sonnet 5.5 rejects a custom temperature
+    max_tokens: 8000
+    price_usd_per_mtok:                   # Anthropic list price, checked 9 Oct 2026
+      input: 2.00
+      output: 10.00
+  judges:                                 # the pair the router will use once Grok has judged the dev answers
+    - name: openai
+      provider: openai
+      model: gpt-6-luna
+      temperature: null
+      max_tokens: 4000
+      price_usd_per_mtok: {input: 0.10, output: 0.50}
+    - name: grok
+      provider: xai
+      model: grok-4.20-0309-reasoning
+      temperature: null
+      max_tokens: 8000
+      price_usd_per_mtok: {input: 1.25, output: 2.50}
+
+warehouse:                                # Stage 7: BigQuery copy of the logs, rebuilt in full on every load
+  project: juniper-eval-harness
+  location: australia-southeast1          # Sydney; fixed once the datasets exist
+  raw_dataset: juniper_eval_raw           # loaded by python -m harness.load
+  dbt_dataset: juniper_eval               # built by dbt from the raw tables
+  hand_labels: [data/labels/label_sheet.csv, data/labels/label_sheet_v1_v2.csv]
+  ai_labels: [data/labels/claude_labels.csv]
 
 paths:
   cases: data/test_cases.csv
@@ -76,3 +112,4 @@ paths:
   answers: runs/answers.jsonl
   judgements: runs/judgements.jsonl
   routes: runs/routes.jsonl
+  rewrites: runs/rewrites.jsonl

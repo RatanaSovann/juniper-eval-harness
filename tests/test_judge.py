@@ -136,7 +136,7 @@ def test_real_config_has_judge_settings():
 
     config = load_config()
     assert config.judge.partition == "dev"
-    assert {j.provider for j in config.judge.judges} == {"openai", "gemini"}
+    assert {j.provider for j in config.judge.judges} == {"openai", "xai"}
 
 
 def test_resume_skips_saved_verdicts_and_keeps_the_run_id(tmp_path):
@@ -180,3 +180,13 @@ def test_labelled_keeps_only_hand_labelled_answers(tmp_path):
         w.writerow(["RUN-1", "MD-01", "grounded", "", "", "", "", ""])  # not labelled yet
     run(config, {"openai": FakeJudge(), "gemini": FakeJudge()}, labelled=True, log=lambda *_: None)
     assert {r.case_id for r in read_judgements(config)} == {"MD-02"}
+
+
+def test_grok_judge_uses_the_openai_sdk_pointed_at_xai(monkeypatch):
+    from harness.judge import PROVIDERS
+    from harness.config import load_config
+
+    monkeypatch.setenv("XAI_API_KEY", "test-key")
+    grok = next(j for j in load_config().judge.judges if j.provider == "xai")
+    model = PROVIDERS["xai"](grok)
+    assert str(model.client.base_url).startswith("https://api.x.ai/v1") and model.client.api_key == "test-key"

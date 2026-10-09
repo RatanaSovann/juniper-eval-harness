@@ -29,17 +29,25 @@ from harness.validate_cases import validate
 
 BUSY_CODES = [429, 500, 502, 503, 504]
 RETRY_NOTE = "\n\nYour last reply could not be read. Reply with JSON only, in exactly the shape given."
-KEY_VARS = {"openai": "OPENAI_API_KEY", "gemini": "GEMINI_API_KEY"}
+KEY_VARS = {"openai": "OPENAI_API_KEY", "gemini": "GEMINI_API_KEY", "xai": "XAI_API_KEY"}
 
 
 class OpenAIModel:
     """An OpenAI judge, called through the official OpenAI SDK in JSON mode."""
 
-    def __init__(self, cfg: JudgeModel):
+    def __init__(self, cfg: JudgeModel, **client_args):
         import openai  # imported here so tests never need the SDK or a key
 
-        self.client = openai.OpenAI(max_retries=5)  # key from OPENAI_API_KEY; SDK backs off between tries
+        # key from OPENAI_API_KEY unless client_args say otherwise; SDK backs off between tries
+        self.client = openai.OpenAI(max_retries=5, **client_args)
         self.cfg = cfg
+
+
+class XAIModel(OpenAIModel):
+    """An xAI Grok judge. xAI's API is OpenAI-compatible, so it is the OpenAI SDK pointed at api.x.ai."""
+
+    def __init__(self, cfg: JudgeModel):
+        super().__init__(cfg, base_url="https://api.x.ai/v1", api_key=os.environ.get("XAI_API_KEY"))
 
     def complete(self, system: str | None, user: str) -> Completion:
         kwargs = {} if self.cfg.temperature is None else {"temperature": self.cfg.temperature}
@@ -85,7 +93,7 @@ class GeminiModel:
                           str(finish) if finish else None)
 
 
-PROVIDERS = {"openai": OpenAIModel, "gemini": GeminiModel}
+PROVIDERS = {"openai": OpenAIModel, "gemini": GeminiModel, "xai": XAIModel}
 
 
 def build_system(config: Config, case: TestCase) -> str:
@@ -179,6 +187,34 @@ def load_resume(config: Config, judge_run_id: str) -> tuple[set[tuple], float]:
     return {(r.case_id, r.variant, r.judge, r.repeat) for r in rows}, sum(r.cost_aud for r in rows)
 
 
+def judge_once(config: Config, model: ChatModel, jcfg: JudgeModel, system: str, user: str, spent: float,
+               **ids) -> Judgement:
+    """One verdict from one judge: unusable JSON gets one retry, then the verdict is "invalid".
+
+    spent is what the run has already spent; raises CostCapReached before any call that could
+    push it past cost.max_aud_per_run. ids fills the Judgement's run, case, variant and repeat fields.
+    """
+    cap = config.cost.max_aud_per_run
+    scores, text, attempts, tokens_in, tokens_out, cost = None, "", 0, 0, 0, 0.0
+    while scores is None and attempts < 2:
+        prompt = user if attempts == 0 else user + RETRY_NOTE
+        next_max = worst_case_aud(config, system, prompt, jcfg)
+        if spent + cost + next_max > cap:
+            raise CostCapReached(f"Cost cap: spent A${spent + cost:.2f} of A${cap:.2f}; "
+                                 f"next call could cost up to A${next_max:.2f}.")
+        c = model.complete(system, prompt)
+        attempts += 1
+        tokens_in, tokens_out = tokens_in + c.input_tokens, tokens_out + c.output_tokens
+        cost += cost_aud(config, c.input_tokens, c.output_tokens, jcfg)
+        text, scores = c.text, parse_scores(c.text)
+    return Judgement(
+        **ids, judge=jcfg.name, model=jcfg.model, prompt_version=config.judge.prompt.stem,
+        attempts=attempts, status="valid" if scores else "invalid", scores=scores,
+        raw=None if scores else text, timestamp=datetime.now(timezone.utc),
+        input_tokens=tokens_in, output_tokens=tokens_out, cost_aud=round(cost, 6),
+    )
+
+
 def run(config: Config, models: dict[str, ChatModel], limit: int | None = None, log=print,
         resume: str | None = None, labelled: bool = False) -> tuple[str, int, float]:
     """Score each selected answer with each judge, judge.repeats times, appending one line per verdict.
@@ -196,7 +232,6 @@ def run(config: Config, models: dict[str, ChatModel], limit: int | None = None, 
         judge_run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
         done, spent = set(), 0.0
     cap, repeats = config.cost.max_aud_per_run, config.judge.repeats
-    prompt_version = config.judge.prompt.stem
     written = 0
 
     config.paths.judgements.parent.mkdir(parents=True, exist_ok=True)
@@ -210,30 +245,15 @@ def run(config: Config, models: dict[str, ChatModel], limit: int | None = None, 
                 for repeat in range(1, repeats + 1):
                     if (answer.case_id, answer.variant, jcfg.name, repeat) in done:
                         continue
-                    scores, text, attempts, tokens_in, tokens_out, cost = None, "", 0, 0, 0, 0.0
-                    while scores is None and attempts < 2:
-                        prompt = user if attempts == 0 else user + RETRY_NOTE
-                        next_max = worst_case_aud(config, system, prompt, jcfg)
-                        if spent + cost + next_max > cap:
-                            raise CostCapReached(
-                                f"Cost cap: spent A${spent + cost:.2f} of A${cap:.2f}; next call could cost up to "
-                                f"A${next_max:.2f}. Stopped after {written} verdicts (judge_run_id {judge_run_id})."
-                            )
-                        c = models[jcfg.name].complete(system, prompt)
-                        attempts += 1
-                        tokens_in, tokens_out = tokens_in + c.input_tokens, tokens_out + c.output_tokens
-                        cost += cost_aud(config, c.input_tokens, c.output_tokens, jcfg)
-                        text, scores = c.text, parse_scores(c.text)
-                    row = Judgement(
-                        judge_run_id=judge_run_id, answer_run_id=answer.run_id, case_id=answer.case_id,
-                        variant=answer.variant, judge=jcfg.name, model=jcfg.model, prompt_version=prompt_version,
-                        repeat=repeat, attempts=attempts, status="valid" if scores else "invalid",
-                        scores=scores, raw=None if scores else text, timestamp=datetime.now(timezone.utc),
-                        input_tokens=tokens_in, output_tokens=tokens_out, cost_aud=round(cost, 6),
-                    )
+                    try:
+                        row = judge_once(config, models[jcfg.name], jcfg, system, user, spent,
+                                         judge_run_id=judge_run_id, answer_run_id=answer.run_id,
+                                         case_id=answer.case_id, variant=answer.variant, repeat=repeat)
+                    except CostCapReached as e:
+                        raise CostCapReached(f"{e} Stopped after {written} verdicts (judge_run_id {judge_run_id}).") from None
                     out.write(row.model_dump_json() + "\n")
                     out.flush()
-                    spent += cost
+                    spent += row.cost_aud
                     written += 1
                     log(f"  {answer.case_id:<10} {answer.variant:<15} {jcfg.name:<7} r{repeat} "
                         f"{row.status:<7} A${spent:.3f}")

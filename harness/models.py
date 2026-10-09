@@ -261,3 +261,27 @@ class RouteDecision(BaseModel):
     random_audit: bool
     priority: int = Field(ge=1)   # 1 = review first; auto routes get their place too, for completeness
     timestamp: datetime
+
+
+class Rewrite(BaseModel):
+    """One reworded copy of a bot answer for the judge audit, as written to runs/rewrites.jsonl.
+
+    kept is False when the safety check found something the original said that the rewrite
+    lost (or a rule result that changed); those rewrites are never judged.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    audit_run_id: str = Field(min_length=1)
+    answer_run_id: str = Field(min_length=1)
+    case_id: str = Field(min_length=1)
+    variant: str = Field(min_length=1)
+    style: str = Field(min_length=1)
+    rewriter_model: str | None      # model that actually wrote it (after any fallback); None for label-only styles
+    text: str
+    kept: bool
+    problems: list[str]
+    input_tokens: int = Field(ge=0)
+    output_tokens: int = Field(ge=0)
+    cost_aud: float = Field(ge=0)
+    timestamp: datetime

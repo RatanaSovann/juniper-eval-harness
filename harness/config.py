@@ -76,12 +76,31 @@ class RouterConfig(_Strict):
     judge_runs: dict[str, str]   # judge name -> judge_run_id whose verdicts the router uses
 
 
+class AuditConfig(_Strict):
+    partition: str
+    risk_levels: list[str]
+    styles: list[str]
+    repeats: int = Field(ge=1)
+    rewriter: BotConfig
+    judges: list[JudgeModel] = Field(min_length=1)   # the pair the router uses, which may differ from judge.judges
+
+
+class WarehouseConfig(_Strict):
+    project: str
+    location: str
+    raw_dataset: str
+    dbt_dataset: str
+    hand_labels: list[Path]       # label sheets written by a person
+    ai_labels: list[Path]         # AI reference labels; never treated as human gold
+
+
 class Paths(_Strict):
     cases: Path
     sources: Path
     answers: Path
     judgements: Path
     routes: Path
+    rewrites: Path
 
 
 class Config(_Strict):
@@ -93,6 +112,8 @@ class Config(_Strict):
     labels: LabelsConfig
     judge: JudgeConfig
     router: RouterConfig
+    audit: AuditConfig
+    warehouse: WarehouseConfig
     paths: Paths
 
     def resolve(self, root: Path) -> "Config":
@@ -110,6 +131,8 @@ class Config(_Strict):
         c.labels.sheet, c.labels.rubric = root / c.labels.sheet, root / c.labels.rubric
         c.judge.prompt = root / c.judge.prompt
         c.router.rules = root / c.router.rules
+        c.warehouse.hand_labels = [root / p for p in c.warehouse.hand_labels]
+        c.warehouse.ai_labels = [root / p for p in c.warehouse.ai_labels]
         return c
 
 

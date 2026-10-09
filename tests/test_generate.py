@@ -51,8 +51,19 @@ def make_config(tmp_path, cap=5.0, prompt=True):
                               "max_tokens": 500, "price_usd_per_mtok": {"input": 1.0, "output": 5.0}}
                              for name in ("openai", "gemini")]},
         "router": {"rules": "routing.yaml", "judge_runs": {"openai": "J-1", "gemini": "J-1"}},
+        "audit": {"partition": "locked", "risk_levels": ["medium"], "repeats": 2,
+                  "styles": ["longer", "shorter", "politer", "other_model"],
+                  "rewriter": {"provider": "anthropic", "model": "rewriter-fake", "temperature": None, "max_tokens": 500,
+                               "price_usd_per_mtok": {"input": 2.0, "output": 10.0}},
+                  "judges": [{"name": name, "provider": name, "model": f"{name}-audit", "temperature": None,
+                              "max_tokens": 500, "price_usd_per_mtok": {"input": 1.0, "output": 5.0}}
+                             for name in ("openai", "gemini")]},
+        "warehouse": {"project": "proj", "location": "australia-southeast1", "raw_dataset": "raw",
+                      "dbt_dataset": "marts", "hand_labels": ["labels/label_sheet.csv"],
+                      "ai_labels": ["labels/ai_labels.csv"]},
         "paths": {"cases": "cases.csv", "sources": "sources.md", "answers": "runs/answers.jsonl",
-                  "judgements": "runs/judgements.jsonl", "routes": "runs/routes.jsonl"},
+                  "judgements": "runs/judgements.jsonl", "routes": "runs/routes.jsonl",
+                  "rewrites": "runs/rewrites.jsonl"},
     }
     (tmp_path / "config.yaml").write_text(yaml.safe_dump(cfg), encoding="utf-8")
     return load_config(tmp_path / "config.yaml", root=tmp_path)

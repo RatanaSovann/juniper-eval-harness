@@ -117,20 +117,21 @@ class Routed:
     random_audit: bool = False
 
 
+def first_route(rules: RoutingRules, ev: Evidence, judges: list[str]) -> "Routed":
+    """The route from the first rule that matches, or the policy's default. No random audit."""
+    for i, rule in enumerate(rules.rules):
+        if matches(rule.when, ev, judges):
+            return Routed(ev, rule.then, rule.name, rule.reason, i)
+    return Routed(ev, rules.default, "default", "No rule fired.", len(rules.rules))
+
+
 def route_all(rules: RoutingRules, evidence: list[Evidence], judges: list[str]) -> tuple[list[Routed], list[Routed]]:
     """Apply the rules (first match wins), then the random audit.
 
     Returns (before_audit, after_audit), both sorted into review-priority order. Misses are
     measured on before_audit, because an audit catch is luck, not policy.
     """
-    before = []
-    for ev in evidence:
-        for i, rule in enumerate(rules.rules):
-            if matches(rule.when, ev, judges):
-                before.append(Routed(ev, rule.then, rule.name, rule.reason, i))
-                break
-        else:
-            before.append(Routed(ev, rules.default, "default", "No rule fired.", len(rules.rules)))
+    before = [first_route(rules, ev, judges) for ev in evidence]
 
     passed = sorted((r for r in before if r.route == "auto_pass"), key=lambda r: (r.ev.case_id, r.ev.variant))
     a = rules.random_audit
