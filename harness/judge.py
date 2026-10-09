@@ -43,12 +43,6 @@ class OpenAIModel:
         self.cfg = cfg
 
 
-class XAIModel(OpenAIModel):
-    """An xAI Grok judge. xAI's API is OpenAI-compatible, so it is the OpenAI SDK pointed at api.x.ai."""
-
-    def __init__(self, cfg: JudgeModel):
-        super().__init__(cfg, base_url="https://api.x.ai/v1", api_key=os.environ.get("XAI_API_KEY"))
-
     def complete(self, system: str | None, user: str) -> Completion:
         kwargs = {} if self.cfg.temperature is None else {"temperature": self.cfg.temperature}
         response = self.client.chat.completions.create(
@@ -61,6 +55,13 @@ class XAIModel(OpenAIModel):
         choice = response.choices[0]
         return Completion(choice.message.content or "", response.usage.prompt_tokens,
                           response.usage.completion_tokens, choice.finish_reason)
+
+
+class XAIModel(OpenAIModel):
+    """An xAI Grok judge. xAI's API is OpenAI-compatible, so it is the OpenAI SDK pointed at api.x.ai."""
+
+    def __init__(self, cfg: JudgeModel):
+        super().__init__(cfg, base_url="https://api.x.ai/v1", api_key=os.environ.get("XAI_API_KEY"))
 
 
 class GeminiModel:

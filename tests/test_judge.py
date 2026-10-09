@@ -190,3 +190,12 @@ def test_grok_judge_uses_the_openai_sdk_pointed_at_xai(monkeypatch):
     grok = next(j for j in load_config().judge.judges if j.provider == "xai")
     model = PROVIDERS["xai"](grok)
     assert str(model.client.base_url).startswith("https://api.x.ai/v1") and model.client.api_key == "test-key"
+
+
+def test_every_real_judge_class_can_score(monkeypatch):
+    """Guards against a class losing its complete() method (the bug that broke OpenAI after adding Grok)."""
+    from harness.judge import PROVIDERS, OpenAIModel
+
+    for cls in PROVIDERS.values():
+        assert callable(getattr(cls, "complete", None)), cls.__name__
+    assert "complete" in OpenAIModel.__dict__  # defined on OpenAIModel itself, which XAIModel inherits
