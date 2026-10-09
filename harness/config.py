@@ -71,11 +71,17 @@ class JudgeConfig(_Strict):
     judges: list[JudgeModel] = Field(min_length=1)
 
 
+class RouterConfig(_Strict):
+    rules: Path
+    judge_runs: dict[str, str]   # judge name -> judge_run_id whose verdicts the router uses
+
+
 class Paths(_Strict):
     cases: Path
     sources: Path
     answers: Path
     judgements: Path
+    routes: Path
 
 
 class Config(_Strict):
@@ -86,6 +92,7 @@ class Config(_Strict):
     rule_checks: RuleChecksConfig
     labels: LabelsConfig
     judge: JudgeConfig
+    router: RouterConfig
     paths: Paths
 
     def resolve(self, root: Path) -> "Config":
@@ -102,6 +109,7 @@ class Config(_Strict):
             root / rc.promptfoo_config, root / rc.promptfoo_results, root / rc.hits)
         c.labels.sheet, c.labels.rubric = root / c.labels.sheet, root / c.labels.rubric
         c.judge.prompt = root / c.judge.prompt
+        c.router.rules = root / c.router.rules
         return c
 
 

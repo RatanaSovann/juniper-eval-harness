@@ -64,8 +64,15 @@ judge:
         input: 0.75
         output: 3.75
 
+router:
+  rules: rules/routing_v2.yaml           # your policy (v2 adopted 09 Oct 2026); reasoning in docs/routing_rules.md
+  judge_runs:                             # whose verdicts the router reads; answers come from judge.answers_run
+    openai: 20261009T001243Z-ff6b22       # gpt-6-luna, all 88 dev answers
+    gemini: 20261009T001243Z-ff6b22       # gemini-3.5-flash-lite (3.8-flash run only covers labelled answers, unfinished)
+
 paths:
   cases: data/test_cases.csv
   sources: data/sources.md
   answers: runs/answers.jsonl
   judgements: runs/judgements.jsonl
+  routes: runs/routes.jsonl

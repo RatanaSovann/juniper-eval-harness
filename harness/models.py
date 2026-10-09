@@ -175,3 +175,89 @@ class Judgement(BaseModel):
         if (self.status == "valid") != (self.scores is not None):
             raise ValueError("a valid judgement has scores; an invalid one has none")
         return self
+
+
+Route = Literal["auto_pass", "human_review", "auto_fail"]
+Metric = Literal["safety", "grounding", "scope", "escalation"]
+
+
+class Condition(BaseModel):
+    """What must be true for a routing rule to fire. Every field given must hold (AND).
+
+    any_judge: any judge's first score on any listed metric is one of the listed scores.
+    any_unsure: any judge said "unsure" on any listed metric.
+    judge_flipped: any judge gave a different score on its two repeats, on any listed metric.
+    no_verdict: a judge has no usable verdict for this answer (missing or invalid).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    risk_level: list[Literal["low", "medium", "high", "critical"]] | None = None
+    rule_check: Literal["fail"] | None = None
+    any_judge: dict[Metric, list[Literal[0, 1, 2]]] | None = None
+    any_unsure: list[Metric] | None = None
+    judge_flipped: list[Metric] | None = None
+    no_verdict: Literal[True] | None = None
+
+    @model_validator(mode="after")
+    def not_empty(self):
+        if not self.model_fields_set:
+            raise ValueError("a rule needs at least one condition")
+        return self
+
+
+class RoutingRule(BaseModel):
+    """One line of the routing policy: if the condition holds, take this route, for this reason."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    name: str = Field(min_length=1)
+    when: Condition = Field(alias="if")
+    then: Route
+    reason: str = Field(min_length=1)
+
+
+class RandomAudit(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    share: float = Field(ge=0, le=1)
+    min: int = Field(ge=0)
+    seed: int
+
+
+class RoutingRules(BaseModel):
+    """A whole routing policy (rules/routing_*.yaml). Rules are checked in order; the first match wins."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    version: str = Field(min_length=1)
+    rules: list[RoutingRule]
+    default: Route
+    random_audit: RandomAudit
+
+    @model_validator(mode="after")
+    def unique_names(self):
+        names = [r.name for r in self.rules]
+        if len(names) != len(set(names)):
+            raise ValueError("rule names must be unique")
+        return self
+
+
+class RouteDecision(BaseModel):
+    """Where one answer was sent and why, as written to runs/routes.jsonl."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    route_run_id: str = Field(min_length=1)
+    rules_version: str = Field(min_length=1)
+    answer_run_id: str = Field(min_length=1)
+    judge_runs: dict[str, str]
+    case_id: str = Field(min_length=1)
+    variant: str = Field(min_length=1)
+    risk_level: str
+    route: Route
+    rule: str            # name of the rule that fired, "default", or "random_audit"
+    reason: str
+    random_audit: bool
+    priority: int = Field(ge=1)   # 1 = review first; auto routes get their place too, for completeness
+    timestamp: datetime

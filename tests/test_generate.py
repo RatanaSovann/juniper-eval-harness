@@ -50,8 +50,9 @@ def make_config(tmp_path, cap=5.0, prompt=True):
                   "judges": [{"name": name, "provider": name, "model": f"{name}-fake", "temperature": 0,
                               "max_tokens": 500, "price_usd_per_mtok": {"input": 1.0, "output": 5.0}}
                              for name in ("openai", "gemini")]},
+        "router": {"rules": "routing.yaml", "judge_runs": {"openai": "J-1", "gemini": "J-1"}},
         "paths": {"cases": "cases.csv", "sources": "sources.md", "answers": "runs/answers.jsonl",
-                  "judgements": "runs/judgements.jsonl"},
+                  "judgements": "runs/judgements.jsonl", "routes": "runs/routes.jsonl"},
     }
     (tmp_path / "config.yaml").write_text(yaml.safe_dump(cfg), encoding="utf-8")
     return load_config(tmp_path / "config.yaml", root=tmp_path)
