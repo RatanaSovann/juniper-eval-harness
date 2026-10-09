@@ -89,20 +89,20 @@ class Svg:
 def harness_flow(t):
     s = Svg(680, 820, "How the harness works",
             "73 test cases go to the bot, then rule checks and two AI judges. Blind labels and a judge audit "
-            "measure the judges and backtest the router. The router sends 33 of 88 answers to auto-pass, 55 to "
-            "human review and 0 to auto-fail. The scorecard shows 0 of 4 hard fails missed (range 0 to 49 percent); "
-            "an alert fails the build if a hard fail is auto-passed.", t)
+            "measure the judges and backtest the router. The router sends each answer to auto-pass, human review "
+            "or auto-fail. The scorecard shows the severe miss rate beside review load; an alert fails the build "
+            "if a hard fail is auto-passed.", t)
     s.box(150, 40, 260, 56, "gray", "Test set", "73 cases: 50 dev, 23 locked")
     s.arrow("M280 96 V118")
     s.box(150, 120, 260, 56, "purple", "L0 Bot answers", "Claude Haiku 4.5, v1 vs v2")
     s.arrow("M280 176 V198")
-    s.box(150, 200, 260, 56, "purple", "L1 Rule checks", "promptfoo: caught 2 of 4")
+    s.box(150, 200, 260, 56, "purple", "L1 Rule checks", "promptfoo, exact facts")
     s.arrow("M280 256 V278")
     s.box(150, 280, 260, 56, "purple", "L2 Two judges", "gpt-6-luna + Grok, twice")
     s.arrow("M280 336 V358")
     s.box(150, 360, 260, 56, "purple", "L4 Router", "routing_v2.yaml")
     s.frame(440, 200, 200, 146, "Measuring the judges")
-    s.box(452, 228, 176, 50, "coral", "L3 Blind labels", "42 answers, kappa")
+    s.box(452, 228, 176, 50, "coral", "L3 Blind labels", "Blind, kappa")
     s.box(452, 286, 176, 50, "purple", "L5 Judge audit", "4 rewrites per answer")
     s.arrow("M440 308 H412")
     s.dashed("M540 346 V388 H412")
@@ -110,17 +110,17 @@ def harness_flow(t):
     s.arrow("M180 416 V432 H115 V446")
     s.arrow("M285 416 V446")
     s.arrow("M380 416 V432 H455 V446")
-    s.box(40, 448, 150, 56, "gray", "Auto-pass", "33 of 88")
-    s.box(210, 448, 150, 56, "coral", "Human review", "55 of 88 + audit")
-    s.box(380, 448, 150, 56, "gray", "Auto-fail", "0 of 88")
+    s.box(40, 448, 150, 56, "gray", "Auto-pass", "Both judges clean")
+    s.box(210, 448, 150, 56, "coral", "Human review", "Flagged + 10% audit")
+    s.box(380, 448, 150, 56, "gray", "Auto-fail", "Not used yet")
     for x in (115, 285, 455):
         s.arrow(f"M{x} 504 V526")
-    s.box(40, 528, 490, 56, "purple", "L6 Scorecard, BigQuery + dbt", "Severe miss 0 of 4 (range 0–49%), review 55 of 88")
+    s.box(40, 528, 490, 56, "purple", "L6 Scorecard, BigQuery + dbt", "Severe miss rate beside review load")
     s.arrow("M285 584 V606")
     s.diamond(285, 648, 90, 40, "Hard fail auto-passed?")
     s.arrow("M375 648 H418")
     s.text(382, 640, "yes")
-    s.box(420, 620, 200, 56, "coral", "dbt build fails", "Fire-drilled, it works")
+    s.box(420, 620, 200, 56, "coral", "dbt build fails", "Alert, nothing ships")
     s.arrow("M285 688 V710")
     s.text(293, 704, "no")
     s.box(135, 712, 300, 56, "gray", "Scorecard published", "Dagster runs the pipeline")
