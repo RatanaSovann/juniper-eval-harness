@@ -105,7 +105,7 @@ warehouse:                                # Stage 7: BigQuery copy of the logs, 
   raw_dataset: juniper_eval_raw           # loaded by python -m harness.load
   dbt_dataset: juniper_eval               # built by dbt from the raw tables
   hand_labels: [data/labels/label_sheet.csv, data/labels/label_sheet_v1_v2.csv]
-  ai_labels: [data/labels/claude_labels.csv]
+  ai_labels: [data/labels/claude_labels.csv, data/labels/claude_labels_locked.csv]
 
 paths:
   cases: data/test_cases.csv
