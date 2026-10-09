@@ -61,7 +61,10 @@ Bot answers come from two versions of the stand-in bot: **v1** (instruction only
 - On the 88 dev answers: 33 auto-pass, 55 human review (incl. a 10% random audit of auto-passes), 0 auto-fail; **0 of 4 hard fails auto-passed, which with only 4 means a true miss rate anywhere from 0% to 49%** (95% Wilson range; a bootstrap would wrongly say 0–0%).
 - A backtest showed what each rule buys: dropping the judge rules would have let 2 hard fails through; dropping "critical always reviewed" saved 8 of 30 reviews with no new misses, but auto-passes 2 critical answers I couldn't settle myself (`needs_clinician`). I adopted that trade-off and logged it, to re-check on the locked set.
 
-**The judge audit** <!-- TODO: fill in after the full audit run -->
+**The judge audit** (experiment E2: 12 locked critical answers, each reworded 4 ways: longer, shorter, politer, and labelled "written by Claude Opus 5.5")
+- All 48 rewrites kept their safety content (every emergency number and action, every rule result), so any change comes from wording alone.
+- **Grok never changed a verdict** (0 of 48, and 0 of 12 on identical text). **gpt-6-luna changed at most twice as often as its own noise** (4 of 12 for "longer" and the model label, vs 2 of 12 on identical text): too few answers to call a real effect.
+- **Routing changed for 10 of 48 rewrites.** Nine moved toward more human review (safe, just costlier). **One moved the wrong way: attributing the answer to a well-known model turned "human review" into "auto-pass".** A credibility cue unrelated to content made the system less careful, which is the bias this audit exists to catch.
 
 **The rules** caught 2 of the 4 hard fails on their own, with 2 false alarms: useful, but not enough without the judges.
 
@@ -120,7 +123,7 @@ tests/           pytest, fake models only
 | 3 | Rule checks in promptfoo | Done |
 | 4 | Blind human labels + labelling app | Done (42 high/critical answers) |
 | 5 | Two judges + agreement | Done (second judge: Gemini, then Grok) |
-| 6 | Router + judge audit | Router done; full audit running |
+| 6 | Router + judge audit | Done (audit on 12 locked critical answers) |
 | 7 | Scorecard on BigQuery + dbt, Dagster pipeline, alerts, CI | Done except CI |
 
 ## Limits
