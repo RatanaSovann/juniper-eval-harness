@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" width="1000" height="560" role="img" aria-labelledby="t d">
+<title id="t">How the harness checks an answer</title>
+<desc id="d">Test cases go to the bot under test; answers pass rule checks and two AI judges; a versioned routing policy sends each answer to auto-pass, human review or auto-fail. Blind human labels measure judge agreement and backtest the router; a judge audit rewords answers to count verdict flips. Every step logs append-only files, which are loaded into BigQuery and built by dbt into a scorecard with alerts, orchestrated by Dagster.</desc>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#6E7781"/></marker><marker id="headA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#4FB3A8"/></marker></defs>
+<rect width="1000" height="560" fill="#0D1117"/>
+<text x="32" y="42" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" fill="#E6E3DE" text-anchor="start">Every answer is checked three ways; a versioned policy decides who reads it</text>
+<text x="32" y="63" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#9EA7B0" text-anchor="start">Rules catch exact facts, two judges score the rest, and the judges themselves are measured against blind human labels.</text>
+<rect x="32" y="104" width="138" height="84" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="46" y="124" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">TEST SET</text>
+<text x="46" y="143" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">73 cases</text>
+<text x="46" y="161" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">Australian leaflets</text>
+<text x="46" y="176" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">50 dev · 23 locked</text>
+<rect x="194" y="104" width="150" height="84" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="208" y="124" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">L0  GENERATE</text>
+<text x="208" y="143" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">Bot answers</text>
+<text x="208" y="161" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">Claude Haiku 4.5</text>
+<text x="208" y="176" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">prompt v1 vs v2</text>
+<rect x="368" y="104" width="150" height="84" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="382" y="124" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">L1  RULES</text>
+<text x="382" y="143" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">Rule checks</text>
+<text x="382" y="161" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">promptfoo</text>
+<text x="382" y="176" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">exact facts, e.g. 5-day rule</text>
+<rect x="542" y="104" width="158" height="84" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="556" y="124" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">L2  JUDGES</text>
+<text x="556" y="143" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">Two AI judges</text>
+<text x="556" y="161" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">gpt-6-luna + grok</text>
+<text x="556" y="176" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">4 metrics, scored twice</text>
+<rect x="724" y="104" width="112" height="84" rx="8" fill="#4FB3A8" stroke="#4FB3A8" stroke-width="1"/>
+<text x="738" y="124" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#0D1117" text-anchor="start" letter-spacing="0.08em">L4  ROUTER</text>
+<text x="738" y="143" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#0D1117" text-anchor="start">Policy</text>
+<text x="738" y="161" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#0D1117" text-anchor="start">routing_v2.yaml</text>
+<text x="738" y="176" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#0D1117" text-anchor="start">first rule wins</text>
+<polyline points="170,146.0 192,146.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<polyline points="344,146.0 366,146.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<polyline points="518,146.0 540,146.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<polyline points="700,146.0 722,146.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<rect x="864" y="86.0" width="112" height="36" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="874" y="101.0" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#E6E3DE" text-anchor="start">auto-pass</text>
+<text x="874" y="115.0" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#9EA7B0" text-anchor="start">33 / 88 answers</text>
+<polyline points="836,146.0 848,146.0 848,104.0 862,104.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<rect x="864" y="128.0" width="112" height="36" rx="8" fill="#13302D" stroke="#4FB3A8" stroke-width="1"/>
+<text x="874" y="143.0" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#E6E3DE" text-anchor="start">human review</text>
+<text x="874" y="157.0" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#9EA7B0" text-anchor="start">55 / 88 answers</text>
+<polyline points="836,146.0 848,146.0 848,146.0 862,146.0" fill="none" stroke="#4FB3A8" stroke-width="1.25" marker-end="url(#headA)"/>
+<rect x="864" y="170.0" width="112" height="36" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="874" y="185.0" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#E6E3DE" text-anchor="start">auto-fail</text>
+<text x="874" y="199.0" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#9EA7B0" text-anchor="start">0 / 88 answers</text>
+<polyline points="836,146.0 848,146.0 848,188.0 862,188.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<text x="864" y="222.0" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#9EA7B0" text-anchor="start">incl. 10% random audit</text>
+<text x="368" y="238" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#6E7781" text-anchor="start" letter-spacing="0.08em">MEASURING THE JUDGES</text>
+<rect x="368" y="248" width="200" height="76" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="382" y="268" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">L3  HUMAN LABELS</text>
+<text x="382" y="287" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">Blind hand labels</text>
+<text x="382" y="305" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">42 high/critical answers</text>
+<text x="382" y="320" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">agreement: Cohen's kappa</text>
+<rect x="592" y="248" width="196" height="76" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="606" y="268" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">L5  JUDGE AUDIT</text>
+<text x="606" y="287" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">Reworded answers</text>
+<text x="606" y="305" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">4 rewrites per critical answer</text>
+<text x="606" y="320" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">flips vs same-text noise</text>
+<polyline points="556,248 556,190" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<text x="564" y="234" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#9EA7B0" text-anchor="start">agreement</text>
+<polyline points="676,248 676,190" fill="none" stroke="#6E7781" stroke-width="1.25" stroke-dasharray="4 3" marker-end="url(#head)"/>
+<text x="684" y="234" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#9EA7B0" text-anchor="start">re-judge</text>
+<polyline points="468,324 468,338 800,338 800,190" fill="none" stroke="#4FB3A8" stroke-width="1.25" stroke-dasharray="2 3" marker-end="url(#head)"/>
+<text x="808" y="252" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#4FB3A8" text-anchor="start">backtest:</text>
+<text x="808" y="266" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#4FB3A8" text-anchor="start">did a labelled hard</text>
+<text x="808" y="280" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#4FB3A8" text-anchor="start">fail get auto-passed?</text>
+<rect x="24" y="354" width="952" height="160" rx="10" fill="#1C222B" stroke="#30363D" stroke-width="1"/>
+<text x="40" y="374" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.04em">L6  SCORECARD  ·  orchestrated by Dagster: refresh_scorecard (free) · full_eval (paid, weekly schedule off by default)</text>
+<rect x="40" y="388" width="184" height="74" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="54" y="408" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">LOGS</text>
+<text x="54" y="427" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">runs/*.jsonl</text>
+<text x="54" y="445" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">append-only, one ID per run</text>
+<text x="54" y="460" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">A$5 cost cap per run</text>
+<rect x="248" y="388" width="164" height="74" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="262" y="408" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">LOAD</text>
+<text x="262" y="427" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">BigQuery raw</text>
+<text x="262" y="445" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">juniper_eval_raw</text>
+<text x="262" y="460" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">australia-southeast1</text>
+<rect x="436" y="388" width="176" height="74" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1"/>
+<text x="450" y="408" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#9EA7B0" text-anchor="start" letter-spacing="0.08em">DBT</text>
+<text x="450" y="427" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E6E3DE" text-anchor="start">Views → scorecard</text>
+<text x="450" y="445" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">staging views, mart tables</text>
+<text x="450" y="460" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">data tests every build</text>
+<polyline points="224,425.0 246,425.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<polyline points="412,425.0 434,425.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<polyline points="612,425.0 634,425.0" fill="none" stroke="#6E7781" stroke-width="1.25" marker-end="url(#head)"/>
+<rect x="636" y="388" width="340" height="74" rx="8" fill="#161B22" stroke="#4FB3A8" stroke-width="1"/>
+<text x="650" y="406" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#4FB3A8" text-anchor="start" letter-spacing="0.08em">HEADLINES, ALWAYS SIDE BY SIDE</text>
+<text x="650" y="426" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#E6E3DE" text-anchor="start">Severe miss rate</text>
+<text x="650" y="441" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">0 of 4 hard fails missed</text>
+<text x="650" y="455" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">95% range 0–49%</text>
+<line x1="818" y1="416" x2="818" y2="454" stroke="#30363D" stroke-width="1"/>
+<text x="832" y="426" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#E6E3DE" text-anchor="start">Review load</text>
+<text x="832" y="441" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">55 of 88 answers</text>
+<text x="832" y="455" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#9EA7B0" text-anchor="start">62.5% of the dev set</text>
+<text x="636" y="482" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#E5736B" text-anchor="start">Alert: a hard fail auto-passed fails the build</text>
+<text x="636" y="497" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#9EA7B0" text-anchor="start">No single overall safety percentage, anywhere.</text>
+<line x1="269" y1="188" x2="269" y2="354" stroke="#6E7781" stroke-width="1" stroke-dasharray="2 3"/>
+<text x="277" y="344" font-family="-apple-system, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#9EA7B0" text-anchor="start">every step logs its output</text>
+</svg>

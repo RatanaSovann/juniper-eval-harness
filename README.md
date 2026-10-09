@@ -16,23 +16,20 @@ It only sees questions and answers, so it works on any vendor's bot.
 
 ## How it works
 
-```
-test cases ─► L0 bot answers ─► L1 rule checks ─► L2 two AI judges ─► L4 router ─► auto-pass / human review / auto-fail
-                                                        │                   ▲
-                               L3 human labels ─────────┴──► agreement      │
-                               L5 judge audit: reworded answers, count flips┘
-                               L6 scorecard: severe miss rate + review load
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/flow-dark.svg">
+  <img src="docs/flow-light.svg" width="100%" alt="Flow: 73 test cases go to the bot under test; its answers pass rule checks (promptfoo) and two AI judges (gpt-6-luna and Grok); a versioned routing policy sends each answer to auto-pass (33 of 88), human review (55 of 88) or auto-fail (0). Blind human labels measure judge agreement and backtest the router; a judge audit rewords critical answers and counts verdict flips. Every step logs append-only files, loaded into BigQuery and built by dbt into a scorecard: severe miss rate 0 of 4 hard fails (95% range 0-49%) beside review load 55 of 88, with an alert that fails the build if a hard fail is auto-passed. Dagster runs the pipeline.">
+</picture>
 
 | Layer | What happens | Code |
 |---|---|---|
 | L0 Generate and log | The bot answers every question; each answer is logged append-only with model, prompt version, leaflet date, tokens and cost | `harness/generate.py` |
 | L1 Rule checks | Exact facts checked by text rules in promptfoo, e.g. the Australian 5-day missed-dose rule | `harness/rule_checks.py` |
-| L2 Two judges | Judges from two model families, neither from the bot's, score safety, grounding, scope and escalation (0/1/2 or `unsure`) with a quoted evidence sentence, twice each | `harness/judge.py` |
+| L2 Two judges | Judges from two model families (OpenAI gpt-6-luna, xAI grok-4.20-0309-reasoning), neither from the bot's, score safety, grounding, scope and escalation (0/1/2 or `unsure`) with a quoted evidence sentence, twice each | `harness/judge.py` |
 | L3 Human labels | Blind hand labels in a Streamlit app; Cohen's kappa per judge, metric and category | `harness/label_app.py`, `harness/agreement.py` |
 | L4 Router | A versioned YAML policy sends each answer to auto-pass, human review or auto-fail, with a reason; `--compare` backtests two policies on labelled answers | `harness/router.py`, `rules/` |
 | L5 Judge audit | Critical answers reworded (longer, shorter, politer, "from another model") with safety content checked unchanged; do the judges flip on style alone? | `harness/audit.py` |
-| L6 Scorecard | Severe miss rate (with a bootstrap range) and human review load, in BigQuery + dbt | Stage 7 |
+| L6 Scorecard | Severe miss rate (with a 95% Wilson range) beside human review load, in BigQuery + dbt; an alert fails the build if a hard fail is auto-passed. Dagster runs the whole pipeline | `harness/load.py`, `dbt/`, `harness/pipeline.py` |
 
 ### Design choices worth knowing
 
@@ -56,14 +53,19 @@ Bot answers come from two versions of the stand-in bot: **v1** (instruction only
 - **Kappa is close to 0 for every judge, and that number misleads here:** 39 of 42 labels are "safe", so chance agreement is already high. Hard-fail catches tell the real story.
 - **gemini-3.5-flash-lite rubber-stamped:** it called 97% of answers safe and **missed all 4 hard fails** and the US-rule error, exactly the shared blind spot this project was built to detect.
 - **gpt-6-luna caught or flagged all 4** but is noisy: it changed its own safety score on 12 of 88 answers between identical calls.
-- **grok-4.20-reasoning** replaced Gemini. <!-- TODO: fill in from the Grok agreement report and hard-fail table -->
-- The judges also **found errors in my labels** (e.g. "Wegovy is not approved under 18" is wrong; the leaflet says 12+). One label was revised after review and is reported as no longer blind.
+- **grok-4.20-0309-reasoning** (xAI, a dated snapshot so it cannot change underneath the results) replaced Gemini and did better, but is still lenient: it caught the US-rule error and flagged 2 of 4 hard fails, but called the anaphylaxis "drive yourself" answer fully safe, twice.
+- **So far, the second judge adds almost nothing to routing:** luna + Grok, luna + flash-lite and luna alone all route the same way with 0 misses; Grok alone would miss 2. A second judge earns its place only if it is independent *and* at least as sensitive (experiment E1).
+- The judges also **found errors in my labels** (e.g. "Wegovy is not approved under 18" is wrong; the leaflet says 12+). One label was revised after an OpenAI flag; that alone moved OpenAI's safety kappa from 0.17 to 0.28, so both numbers are reported.
 
 **The router** (`routing_v2`)
-- On the 88 dev answers: 33 auto-pass, 55 human review (incl. a 10% random audit of auto-passes), 0 auto-fail; **0 hard fails auto-passed** on the labelled set.
+- On the 88 dev answers: 33 auto-pass, 55 human review (incl. a 10% random audit of auto-passes), 0 auto-fail; **0 of 4 hard fails auto-passed, which with only 4 means a true miss rate anywhere from 0% to 49%** (95% Wilson range; a bootstrap would wrongly say 0–0%).
 - A backtest showed what each rule buys: dropping the judge rules would have let 2 hard fails through; dropping "critical always reviewed" saved 8 of 30 reviews with no new misses, but auto-passes 2 critical answers I couldn't settle myself (`needs_clinician`). I adopted that trade-off and logged it, to re-check on the locked set.
 
 **The judge audit** <!-- TODO: fill in after the full audit run -->
+
+**The rules** caught 2 of the 4 hard fails on their own, with 2 false alarms: useful, but not enough without the judges.
+
+**Alerting** was fire-drilled: replaying a policy known to miss 2 hard fails made the alert fail `dbt build` as designed.
 
 These are pilot numbers from 4 hard fails and one labeller. They show where the system breaks, not how often.
 
@@ -92,7 +94,7 @@ API keys go in a `.env` file (git-ignored): `ANTHROPIC_API_KEY` (bot, rewriter),
 | Backtest two policies | `python -m harness.router --compare rules/routing_v1.yaml rules/routing_v2.yaml` |
 | Judge audit | `python -m harness.audit`, then `python -m harness.audit --report` |
 | Load into BigQuery | `python -m harness.load` (`--dry-run` to preview); needs `gcloud auth application-default login` |
-| Build the scorecard | `cd dbt; dbt build` (6 views, 5 scorecard tables, 22 data tests) |
+| Build the scorecard | `cd dbt; dbt build` (staging views, scorecard and alert tables, data tests) |
 | Pipeline UI | `dagster dev -m harness.pipeline`: `refresh_scorecard` (free) and `full_eval` (paid, about A$5; weekly schedule off by default) |
 
 ## Repo map
@@ -117,9 +119,9 @@ tests/           pytest, fake models only
 | 2 | Generate and log (v1 vs v2 bot) | Done |
 | 3 | Rule checks in promptfoo | Done |
 | 4 | Blind human labels + labelling app | Done (42 high/critical answers) |
-| 5 | Two judges + agreement | Done; second judge switched to Grok |
-| 6 | Router + judge audit | Router done; audit built, full run pending |
-| 7 | Scorecard on BigQuery + dbt, scheduled with Dagster, CI | Next |
+| 5 | Two judges + agreement | Done (second judge: Gemini, then Grok) |
+| 6 | Router + judge audit | Router done; full audit running |
+| 7 | Scorecard on BigQuery + dbt, Dagster pipeline, alerts, CI | Done except CI |
 
 ## Limits
 
