@@ -16,7 +16,7 @@ from typing import Protocol
 
 from dotenv import load_dotenv
 
-from harness.config import ROOT, Config, load_config
+from harness.config import ROOT, BotConfig, Config, load_config
 from harness.models import LoggedAnswer, TestCase
 from harness.validate_cases import validate
 
@@ -98,17 +98,21 @@ def build_variants(config: Config) -> list[Variant]:
     return variants
 
 
-def cost_aud(config: Config, input_tokens: int, output_tokens: int) -> float:
-    """Price a call in AUD from token counts and the list prices in config.yaml."""
-    p = config.bot.price_usd_per_mtok
+def cost_aud(config: Config, input_tokens: int, output_tokens: int, model: BotConfig | None = None) -> float:
+    """Price a call in AUD from token counts and the list prices in config.yaml.
+
+    model is the bot or judge that made the call; it defaults to the bot under test.
+    """
+    p = (model or config.bot).price_usd_per_mtok
     usd = (input_tokens * p.input + output_tokens * p.output) / 1_000_000
     return usd * config.cost.usd_to_aud
 
 
-def worst_case_aud(config: Config, system: str | None, user: str) -> float:
+def worst_case_aud(config: Config, system: str | None, user: str, model: BotConfig | None = None) -> float:
     """Upper estimate for one call: generous input token guess plus a full max_tokens reply."""
+    model = model or config.bot
     est_input = (len(system or "") + len(user)) // CHARS_PER_TOKEN + 50
-    return cost_aud(config, est_input, config.bot.max_tokens)
+    return cost_aud(config, est_input, model.max_tokens, model)
 
 
 def select_cases(config: Config, limit: int | None) -> list[TestCase]:

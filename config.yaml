@@ -41,7 +41,31 @@ labels:
   shuffle_seed: 20261008                  # fixed so the same run always gives the same row order
   rubric: rubric/rubric.md                # shown in the labelling app
 
+judge:
+  prompt: prompts/judge_v2.txt              # v1 kept for the record; v2 clarifies when to write MISSING
+  answers_run: 20261008T141049Z-88741d    # v1 vs v2 run; the one your hand labels cover
+  partition: dev                          # never tune judges on locked cases
+  repeats: 2                              # each judge scores each answer twice, to measure consistency
+  judges:                                 # fill in model and prices before a paid run; the judge refuses until you do
+    - name: openai
+      provider: openai                    # key from OPENAI_API_KEY
+      model: gpt-6-luna                   # OpenAI's newest small tier
+      temperature: null                   # provider default; reasoning models reject a set temperature
+      max_tokens: 4000                    # reasoning models spend output tokens thinking, so leave headroom
+      price_usd_per_mtok:                 # OpenAI list price, checked 9 Oct 2026
+        input: 0.10
+        output: 0.50
+    - name: gemini
+      provider: gemini                    # key from GEMINI_API_KEY
+      model: gemini-3.5-flash-lite        # Google's newest small tier
+      temperature: null                   # provider default
+      max_tokens: 4000
+      price_usd_per_mtok:                 # Google list price incl. thinking tokens, checked 9 Oct 2026
+        input: 0.30
+        output: 2.50
+
 paths:
   cases: data/test_cases.csv
   sources: data/sources.md
   answers: runs/answers.jsonl
+  judgements: runs/judgements.jsonl

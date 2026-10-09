@@ -27,7 +27,6 @@ Review them if I ask, but the content is mine:
 - `rule_checks` wording
 - Routing rules (what auto-passes, what goes to review)
 - The grounded bot's instruction (`prompts/grounded_*.txt`)
-- All SQL and dbt models
 - `notes/` (build log, criteria drift log)
 
 You may **draft** adversarial variants when I ask. Mark each one `DRAFT` so I review it.
@@ -73,4 +72,6 @@ Update this line at the end of every session.
 - **Done:** Stage 3 (rule checks via promptfoo 0.124.0; require-only rules on 25 dev cases; run 20261007T061343Z-71f54e: 15 fails, all bare, grounded all pass)
 - **Done:** Stage 4 tooling (blind label sheet from run 20261007T061343Z-71f54e, 130 answers, both partitions; Streamlit app `streamlit run harness/label_app.py`). Stage 6 plan now includes a `--compare` routing backtest
 - **Done:** labels. `data/labels/claude_labels.csv` = AI reference labels for all 130 (not blind, not human gold); `label_sheet.csv` = my hand labels on a priority subset (wins on overlap). See `data/labels/README.md`
-- **Next:** Stage 5 (two judges + kappa on dev, reported separately vs AI labels and vs my hand labels). Still open: RF-07-ADV question has no hypo symptoms though `must_include` expects them (fix + log in criteria_drift, regenerate); check DIET_GUIDE content in `data/sources.md`; the 8 coaching-scope cases (incl. MD-01-CO, CO-06) have no answers until a coaching prompt exists (`generate.scopes`); PC-01 forbid has a garbled apostrophe (`don�t stop`)
+- **Done:** v1 vs v2 run 20261008T141049Z-88741d (v1 = grounded_v1, no leaflets, logged as `v1_no_leaflets`; v2 = grounded_v2 + leaflets, logged as `grounded`). My hand labels: 42 high/critical dev answers in `label_sheet_v1_v2.csv` (3 hard fails: PC-01 v1, RF-05-ADV v1, RF-06 v2)
+- **Done:** Stage 5 (`harness/judge.py` + `harness/agreement.py`; judges gpt-6-luna + gemini-3.5-flash-lite, prompt judge_v2, 2 repeats, SDK retries + `--resume`; judge run 20261009T001243Z-ff6b22 on 88 dev answers, 352 verdicts, 0 invalid, A$1.05). Kappa ~0 for both (prevalence: labels almost all 2). Gemini scored 97% safe and missed all 3 hard fails + MD-01 US rule; OpenAI caught/flagged all 3 but noisy (safety changed 12/88 between repeats). Judges found likely label errors (SC-07 v1 grounding)
+- **Next:** review the 64 disagreements (start SC-07, RF-02-ADV, DS-01-ADV), fix + log labels in criteria_drift; commit Stage 5 (labels separately); write `docs/routing_rules.md`; then plan Stage 6. Consider a stronger Gemini tier on dev. AI labels cover the old run only, so no AI-label kappa for this run. Still open: RF-07-ADV question has no hypo symptoms though `must_include` expects them (fix + log in criteria_drift, regenerate); check DIET_GUIDE content in `data/sources.md`; the 8 coaching-scope cases (incl. MD-01-CO, CO-06) have no answers until a coaching prompt exists (`generate.scopes`); PC-01 forbid has a garbled apostrophe (`don�t stop`)

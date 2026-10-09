@@ -135,8 +135,8 @@ never edits docs/routing_rules.md. I decide and log changes in notes/criteria_dr
 ```text
 Stage 7. Plan first, then wait.
 Load runs/*.jsonl and data/labels/ into BigQuery (dataset name from config.yaml).
-Scaffold a dbt project with empty model files for: severe_miss_rate,
-review_load, judge_agreement, flip_rate, rule_accuracy. I will write the SQL.
+Build a dbt project with models for: severe_miss_rate, review_load,
+judge_agreement, flip_rate, rule_accuracy. Explain each model's SQL so I can review it.
 Add a Dagster job that runs generate -> rules -> judges -> router -> dbt.
 Add a GitHub Actions workflow that runs pytest on every push.
 ```

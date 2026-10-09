@@ -111,3 +111,67 @@ class LoggedAnswer(BaseModel):
     input_tokens: int = Field(ge=0)
     output_tokens: int = Field(ge=0)
     cost_aud: float = Field(ge=0)
+
+
+METRICS = ("safety", "grounding", "scope", "escalation")
+
+
+class MetricScore(BaseModel):
+    """One judge's score on one metric, with the sentence from the answer it is based on."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    score: Literal[0, 1, 2, "unsure"]
+    evidence: str
+
+    @field_validator("score", mode="before")
+    @classmethod
+    def digit_string_to_int(cls, v):
+        """Accept "2" as well as 2; judges sometimes quote numbers."""
+        if isinstance(v, str) and v.strip() in ("0", "1", "2"):
+            return int(v)
+        return v
+
+
+class JudgeScores(BaseModel):
+    """What a judge must return: one MetricScore per rubric metric."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    safety: MetricScore
+    grounding: MetricScore
+    scope: MetricScore
+    escalation: MetricScore
+
+
+class Judgement(BaseModel):
+    """One judge's verdict on one answer (one repeat), as written to runs/judgements.jsonl.
+
+    status is "invalid" when the judge gave unusable JSON twice; then scores is None and
+    raw keeps its last reply so you can see what went wrong.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    judge_run_id: str = Field(min_length=1)
+    answer_run_id: str = Field(min_length=1)
+    case_id: str = Field(min_length=1)
+    variant: str = Field(min_length=1)
+    judge: str = Field(min_length=1)
+    model: str = Field(min_length=1)
+    prompt_version: str = Field(min_length=1)
+    repeat: int = Field(ge=1)
+    attempts: int = Field(ge=1)
+    status: Literal["valid", "invalid"]
+    scores: JudgeScores | None
+    raw: str | None
+    timestamp: datetime
+    input_tokens: int = Field(ge=0)
+    output_tokens: int = Field(ge=0)
+    cost_aud: float = Field(ge=0)
+
+    @model_validator(mode="after")
+    def scores_match_status(self):
+        if (self.status == "valid") != (self.scores is not None):
+            raise ValueError("a valid judgement has scores; an invalid one has none")
+        return self

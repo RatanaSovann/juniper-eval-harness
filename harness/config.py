@@ -59,10 +59,23 @@ class LabelsConfig(_Strict):
     rubric: Path
 
 
+class JudgeModel(BotConfig):
+    name: str = Field(min_length=1)
+
+
+class JudgeConfig(_Strict):
+    prompt: Path
+    answers_run: str = Field(min_length=1)
+    partition: str
+    repeats: int = Field(ge=1)
+    judges: list[JudgeModel] = Field(min_length=1)
+
+
 class Paths(_Strict):
     cases: Path
     sources: Path
     answers: Path
+    judgements: Path
 
 
 class Config(_Strict):
@@ -72,6 +85,7 @@ class Config(_Strict):
     leaflets: list[Leaflet]
     rule_checks: RuleChecksConfig
     labels: LabelsConfig
+    judge: JudgeConfig
     paths: Paths
 
     def resolve(self, root: Path) -> "Config":
@@ -87,6 +101,7 @@ class Config(_Strict):
         rc.promptfoo_config, rc.promptfoo_results, rc.hits = (
             root / rc.promptfoo_config, root / rc.promptfoo_results, root / rc.hits)
         c.labels.sheet, c.labels.rubric = root / c.labels.sheet, root / c.labels.rubric
+        c.judge.prompt = root / c.judge.prompt
         return c
 
 

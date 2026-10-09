@@ -46,7 +46,12 @@ def make_config(tmp_path, cap=5.0, prompt=True):
         "rule_checks": {"promptfoo_version": "0.0.0", "promptfoo_config": "pf/config.yaml",
                         "promptfoo_results": "pf/results.json", "hits": "runs/rule_hits.csv"},
         "labels": {"sheet": "labels/label_sheet.csv", "shuffle_seed": 1, "rubric": "rubric.md"},
-        "paths": {"cases": "cases.csv", "sources": "sources.md", "answers": "runs/answers.jsonl"},
+        "judge": {"prompt": "judge.txt", "answers_run": "RUN-1", "partition": "dev", "repeats": 2,
+                  "judges": [{"name": name, "provider": name, "model": f"{name}-fake", "temperature": 0,
+                              "max_tokens": 500, "price_usd_per_mtok": {"input": 1.0, "output": 5.0}}
+                             for name in ("openai", "gemini")]},
+        "paths": {"cases": "cases.csv", "sources": "sources.md", "answers": "runs/answers.jsonl",
+                  "judgements": "runs/judgements.jsonl"},
     }
     (tmp_path / "config.yaml").write_text(yaml.safe_dump(cfg), encoding="utf-8")
     return load_config(tmp_path / "config.yaml", root=tmp_path)

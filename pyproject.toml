@@ -3,7 +3,7 @@ name = "juniper-eval-harness"
 version = "0.1.0"
 description = "Independent eval harness for AI answers to Australian GLP-1 patient questions"
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2", "pyyaml>=6", "anthropic>=1.8", "python-dotenv>=1"]
+dependencies = ["pydantic>=2", "pyyaml>=6", "anthropic>=1.8", "python-dotenv>=1", "openai>=2", "google-genai>=1"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
