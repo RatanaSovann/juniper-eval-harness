@@ -1,5 +1,7 @@
 # GLP-1 AI Answer Eval Harness
 
+[![Live dashboard](https://img.shields.io/badge/Live_dashboard-Open_the_scorecard_→-2563eb?style=for-the-badge)](https://claude.ai/artifact/XXNzQEJBLDMAQMcLgmMxFS)
+
 **Can you trust an AI to check another AI's medical answers?** This project tests that, on questions an Australian patient taking Wegovy or Mounjaro might ask.
 
 It does three things:
