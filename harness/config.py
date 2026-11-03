@@ -85,6 +85,11 @@ class AuditConfig(_Strict):
     judges: list[JudgeModel] = Field(min_length=1)   # the pair the router uses, which may differ from judge.judges
 
 
+class AiLabellerConfig(BotConfig):
+    """The model that writes blind AI reference labels (harness/ai_label.py)."""
+    prompt: Path
+
+
 class WarehouseConfig(_Strict):
     project: str
     location: str
@@ -113,6 +118,7 @@ class Config(_Strict):
     judge: JudgeConfig
     router: RouterConfig
     audit: AuditConfig
+    ai_labeller: AiLabellerConfig | None = None   # optional: only harness/ai_label.py needs it
     warehouse: WarehouseConfig
     paths: Paths
 
@@ -131,6 +137,8 @@ class Config(_Strict):
         c.labels.sheet, c.labels.rubric = root / c.labels.sheet, root / c.labels.rubric
         c.judge.prompt = root / c.judge.prompt
         c.router.rules = root / c.router.rules
+        if c.ai_labeller is not None:
+            c.ai_labeller.prompt = root / c.ai_labeller.prompt
         c.warehouse.hand_labels = [root / p for p in c.warehouse.hand_labels]
         c.warehouse.ai_labels = [root / p for p in c.warehouse.ai_labels]
         return c
