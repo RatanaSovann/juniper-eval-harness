@@ -37,7 +37,7 @@ rule_checks:
   hits: runs/rule_hits.csv                # append-only
 
 labels:
-  sheet: data/labels/label_sheet_v1_v2.csv      # your blind labels; never overwritten by the harness
+  sheet: data/labels/ai_blind_sheet_88741d.csv     # your blind labels; never overwritten by the harness
   shuffle_seed: 20261008                  # fixed so the same run always gives the same row order
   rubric: rubric/rubric.md                # shown in the labelling app
 
