@@ -99,6 +99,16 @@ audit:                                    # Stage 6 judge audit (experiment E2):
       max_tokens: 8000
       price_usd_per_mtok: {input: 1.25, output: 2.50}
 
+ai_labeller:                              # blind AI reference labels: python -m harness.ai_label
+  provider: anthropic                     # anthropic, openai, gemini or xai (key from the matching *_API_KEY)
+  model: ""                               # fill in before a paid run; the script refuses until you do
+  temperature: null
+  max_tokens: 1500                        # the reply is short JSON; headroom for reasoning models
+  price_usd_per_mtok:                     # fill in list prices so the cost cap works
+    input: 0
+    output: 0
+  prompt: prompts/ai_labeller_v1.txt
+
 warehouse:                                # Stage 7: BigQuery copy of the logs, rebuilt in full on every load
   project: juniper-eval-harness
   location: australia-southeast1          # Sydney; fixed once the datasets exist
