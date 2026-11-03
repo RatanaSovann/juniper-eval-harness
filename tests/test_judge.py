@@ -5,10 +5,10 @@ from datetime import datetime, timezone
 
 import pytest
 
-from harness.generate import Completion, CostCapReached
-from harness.judge import parse_scores, run, setup_problems
-from harness.models import Judgement, LoggedAnswer
-from harness.validate_cases import COLUMNS
+from harness.answers.generate import Completion, CostCapReached
+from harness.judges.judge import parse_scores, run, setup_problems
+from harness.core.models import Judgement, LoggedAnswer
+from harness.testset.validate_cases import COLUMNS
 from tests.test_generate import make_config
 
 GOOD_JSON = json.dumps({m: {"score": 2, "evidence": "Take it now."}
@@ -132,7 +132,7 @@ def test_setup_problems_flags_unfilled_models_and_missing_keys(tmp_path, monkeyp
 
 
 def test_real_config_has_judge_settings():
-    from harness.config import load_config
+    from harness.core.config import load_config
 
     config = load_config()
     assert config.judge.partition == "dev"
@@ -183,8 +183,8 @@ def test_labelled_keeps_only_hand_labelled_answers(tmp_path):
 
 
 def test_grok_judge_uses_the_openai_sdk_pointed_at_xai(monkeypatch):
-    from harness.judge import PROVIDERS
-    from harness.config import load_config
+    from harness.judges.judge import PROVIDERS
+    from harness.core.config import load_config
 
     monkeypatch.setenv("XAI_API_KEY", "test-key")
     grok = next(j for j in load_config().judge.judges if j.provider == "xai")
@@ -194,7 +194,7 @@ def test_grok_judge_uses_the_openai_sdk_pointed_at_xai(monkeypatch):
 
 def test_every_real_judge_class_can_score(monkeypatch):
     """Guards against a class losing its complete() method (the bug that broke OpenAI after adding Grok)."""
-    from harness.judge import PROVIDERS, OpenAIModel
+    from harness.judges.judge import PROVIDERS, OpenAIModel
 
     for cls in PROVIDERS.values():
         assert callable(getattr(cls, "complete", None)), cls.__name__

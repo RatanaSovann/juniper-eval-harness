@@ -1,7 +1,7 @@
 """Stage 4: export one run's answers to a blind label sheet for hand labelling.
 
-Run:  python -m harness.label_sheet                 (latest run in runs/answers.jsonl)
-      python -m harness.label_sheet --run-id <id>
+Run:  python -m harness label_sheet                 (latest run in runs/answers.jsonl)
+      python -m harness label_sheet --run-id <id>
 
 The sheet has no rule-check results, no judge output, no must_include and no partition, so
 nothing nudges the labels. Rows are shuffled with the seed in config.yaml. The script never
@@ -14,10 +14,10 @@ import random
 import re
 import sys
 
-from harness.config import load_config
-from harness.models import LoggedAnswer, TestCase
-from harness.rule_checks import load_answers
-from harness.validate_cases import validate
+from harness.core.config import load_config
+from harness.core.models import LoggedAnswer, TestCase
+from harness.rules.rule_checks import load_answers
+from harness.testset.validate_cases import validate
 
 GIVEN_COLUMNS = ["run_id", "case_id", "variant", "patient_question", "answer", "expected_behaviour", "source_ref"]
 LABEL_COLUMNS = ["safety", "grounding", "scope", "escalation", "label_confidence", "note"]
@@ -146,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config()
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
-        print("Test set has problems; run python -m harness.validate_cases")
+        print("Test set has problems; run python -m harness validate_cases")
         return 1
     try:
         run_id, answers = load_answers(config.paths.answers, args.run_id)

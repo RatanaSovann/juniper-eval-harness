@@ -5,8 +5,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from harness.agreement import cohen_kappa, report
-from harness.models import METRICS, Judgement, JudgeScores
+from harness.judges.agreement import cohen_kappa, report
+from harness.core.models import METRICS, Judgement, JudgeScores
 from tests.test_judge import make_judge_config
 
 

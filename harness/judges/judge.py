@@ -1,11 +1,11 @@
 """Have two AI judges score the bot's answers and append their verdicts to runs/judgements.jsonl.
 
-Run:  python -m harness.judge --limit 2      (first 2 answers, every judge, every repeat)
-      python -m harness.judge                (every answer in judge.answers_run and judge.partition)
-      python -m harness.judge --resume <judge_run_id>   (finish a run that stopped part-way)
-      python -m harness.judge --only gemini             (one judge only, e.g. after changing its model)
-      python -m harness.judge --labelled                (only answers you have hand-labelled)
-      python -m harness.judge --partition locked        (the locked set, once, at the end)
+Run:  python -m harness judge --limit 2      (first 2 answers, every judge, every repeat)
+      python -m harness judge                (every answer in judge.answers_run and judge.partition)
+      python -m harness judge --resume <judge_run_id>   (finish a run that stopped part-way)
+      python -m harness judge --only gemini             (one judge only, e.g. after changing its model)
+      python -m harness judge --labelled                (only answers you have hand-labelled)
+      python -m harness judge --partition locked        (the locked set, once, at the end)
 
 Each judge scores each answer judge.repeats times, so you can see whether it agrees with
 itself. Busy-server errors (429/5xx) are retried by the SDKs with growing waits. Unusable JSON gets one retry, then the verdict is logged as "invalid". Scores are
@@ -22,11 +22,11 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
-from harness.agreement import load_labels
-from harness.config import ROOT, Config, JudgeModel, load_config
-from harness.generate import ChatModel, Completion, CostCapReached, cost_aud, worst_case_aud
-from harness.models import Judgement, JudgeScores, LoggedAnswer, TestCase
-from harness.validate_cases import validate
+from harness.judges.agreement import load_labels
+from harness.core.config import ROOT, Config, JudgeModel, load_config
+from harness.answers.generate import ChatModel, Completion, CostCapReached, cost_aud, worst_case_aud
+from harness.core.models import Judgement, JudgeScores, LoggedAnswer, TestCase
+from harness.testset.validate_cases import validate
 
 BUSY_CODES = [429, 500, 502, 503, 504]
 RETRY_NOTE = "\n\nYour last reply could not be read. Reply with JSON only, in exactly the shape given."
@@ -153,7 +153,7 @@ def select_answers(config: Config, limit: int | None, labelled: bool = False) ->
     """
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
-        raise ValueError("Test set has problems; run python -m harness.validate_cases")
+        raise ValueError("Test set has problems; run python -m harness validate_cases")
     by_id = {c.case_id: c for c in cases if c.partition == config.judge.partition}
     keep = load_labels(config.labels.sheet, config.judge.answers_run, set(by_id)) if labelled else None
     picked = []

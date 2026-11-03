@@ -6,8 +6,8 @@ import pytest
 
 pytest.importorskip("google.cloud.bigquery")  # part of the [warehouse] extra
 
-from harness.load import build_tables, infer_schema, load, to_json_ready
-from harness.models import METRICS
+from harness.scorecard.load import build_tables, infer_schema, load, to_json_ready
+from harness.core.models import METRICS
 from tests.test_router import setup_run
 
 

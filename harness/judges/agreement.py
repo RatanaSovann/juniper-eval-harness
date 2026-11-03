@@ -1,8 +1,8 @@
 """How far each judge agrees with a set of labels, and with itself. Reads saved files only.
 
-Run:  python -m harness.agreement                                        (latest judge run vs your hand labels)
-      python -m harness.agreement --labels data/labels/claude_labels.csv  (vs the AI reference labels)
-      python -m harness.agreement --judge-run <judge_run_id>
+Run:  python -m harness agreement                                        (latest judge run vs your hand labels)
+      python -m harness agreement --labels data/labels/claude_labels.csv  (vs the AI reference labels)
+      python -m harness agreement --judge-run <judge_run_id>
 
 Kappa uses each judge's first repeat, on dev cases only, and only where both the label and
 the judge gave a number: "unsure" and invalid verdicts are counted, never turned into
@@ -15,9 +15,9 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from harness.config import Config, load_config
-from harness.models import METRICS, Judgement
-from harness.validate_cases import validate
+from harness.core.config import Config, load_config
+from harness.core.models import METRICS, Judgement
+from harness.testset.validate_cases import validate
 
 LEVELS = (0, 1, 2)
 
@@ -61,7 +61,7 @@ def load_labels(path: Path, answer_run_id: str, dev_ids: set[str]) -> dict[tuple
 def load_judgements(path: Path, judge_run_id: str | None) -> list[Judgement]:
     """Every verdict from one judge run; the most recent run if judge_run_id is None."""
     if not path.exists():
-        raise ValueError(f"No judgements yet ({path}); run python -m harness.judge first")
+        raise ValueError(f"No judgements yet ({path}); run python -m harness judge first")
     rows = [Judgement(**json.loads(line)) for line in path.read_text(encoding="utf-8").splitlines()]
     if not rows:
         raise ValueError(f"No judgements in {path}")

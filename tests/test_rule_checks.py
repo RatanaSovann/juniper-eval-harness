@@ -3,8 +3,8 @@ import csv
 
 import pytest
 
-from harness.models import LoggedAnswer, TestCase
-from harness.rule_checks import (append_hits, build_promptfoo_config, first_match, hits_from_results,
+from harness.core.models import LoggedAnswer, TestCase
+from harness.rules.rule_checks import (append_hits, build_promptfoo_config, first_match, hits_from_results,
                                  load_answers, strip_markdown)
 from tests.test_validate_cases import GOOD
 

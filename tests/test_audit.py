@@ -4,9 +4,9 @@ from datetime import datetime, timezone
 
 import pytest
 
-from harness.audit import OTHER_MODEL_LABEL, STYLE_INSTRUCTIONS, RewriteCall, report, run, safety_problems
-from harness.generate import CostCapReached
-from harness.models import Judgement, LoggedAnswer, Rewrite
+from harness.judges.audit import OTHER_MODEL_LABEL, STYLE_INSTRUCTIONS, RewriteCall, report, run, safety_problems
+from harness.answers.generate import CostCapReached
+from harness.core.models import Judgement, LoggedAnswer, Rewrite
 from tests.test_judge import GOOD_JSON, FakeJudge, make_judge_config
 from tests.test_router import V1
 
@@ -46,7 +46,7 @@ def read(path, model):
 
 def test_safety_check_catches_lost_numbers_and_changed_rules(tmp_path):
     config = make_audit_config(tmp_path)
-    from harness.validate_cases import validate
+    from harness.testset.validate_cases import validate
 
     case = next(c for c in validate(config.paths.cases, config.paths.sources)[0] if c.case_id == "MD-03")
     assert safety_problems(case, ORIGINAL, "Please call **000** right away.") == []
@@ -110,7 +110,7 @@ def test_refused_or_empty_rewrites_are_dropped(tmp_path):
 
 
 def test_real_config_audits_locked_critical_with_the_router_pair():
-    from harness.config import load_config
+    from harness.core.config import load_config
 
     a = load_config().audit
     assert a.partition == "locked" and a.risk_levels == ["critical"]

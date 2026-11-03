@@ -1,7 +1,7 @@
 """Send each answer to auto_pass, human_review or auto_fail, using the rules in rules/routing_*.yaml.
 
-Run:  python -m harness.router                              (route dev answers with router.rules, append to runs/routes.jsonl)
-      python -m harness.router --compare rules/routing_v1.yaml rules/routing_v2.yaml
+Run:  python -m harness router                              (route dev answers with router.rules, append to runs/routes.jsonl)
+      python -m harness router --compare rules/routing_v1.yaml rules/routing_v2.yaml
                                                             (backtest two policies on your labelled answers; writes nothing)
       add --partition locked to either, once, at the end
 
@@ -21,10 +21,10 @@ from pathlib import Path
 
 import yaml
 
-from harness.agreement import load_labels
-from harness.config import Config, load_config
-from harness.models import Condition, Judgement, JudgeScores, LoggedAnswer, RouteDecision, RoutingRules
-from harness.validate_cases import validate
+from harness.judges.agreement import load_labels
+from harness.core.config import Config, load_config
+from harness.core.models import Condition, Judgement, JudgeScores, LoggedAnswer, RouteDecision, RoutingRules
+from harness.testset.validate_cases import validate
 
 
 @dataclass
@@ -52,7 +52,7 @@ def load_evidence(config: Config, partition: str = "dev") -> list[Evidence]:
     """One Evidence per answer of judge.answers_run whose case is in the partition."""
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
-        raise ValueError("Test set has problems; run python -m harness.validate_cases")
+        raise ValueError("Test set has problems; run python -m harness validate_cases")
     by_id = {c.case_id: c for c in cases if c.partition == partition}
     run_id = config.judge.answers_run
 

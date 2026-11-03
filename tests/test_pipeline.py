@@ -5,7 +5,7 @@ pytest.importorskip("dagster")  # part of the [warehouse] extra
 
 from dagster import DefaultScheduleStatus
 
-from harness import pipeline
+from harness.scorecard import pipeline
 
 
 @pytest.fixture

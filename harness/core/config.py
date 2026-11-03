@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]   # harness/core/config.py -> the repo root
 CONFIG = ROOT / "config.yaml"
 
 
@@ -86,7 +86,7 @@ class AuditConfig(_Strict):
 
 
 class AiLabellerConfig(BotConfig):
-    """The model that writes blind AI reference labels (harness/ai_label.py)."""
+    """The model that writes blind AI reference labels (harness/labels/ai_label.py)."""
     prompt: Path
 
 
@@ -118,7 +118,7 @@ class Config(_Strict):
     judge: JudgeConfig
     router: RouterConfig
     audit: AuditConfig
-    ai_labeller: AiLabellerConfig | None = None   # optional: only harness/ai_label.py needs it
+    ai_labeller: AiLabellerConfig | None = None   # optional: only harness/labels/ai_label.py needs it
     warehouse: WarehouseConfig
     paths: Paths
 

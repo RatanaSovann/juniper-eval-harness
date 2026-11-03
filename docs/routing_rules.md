@@ -1,6 +1,6 @@
 # Routing rules
 
-These are policy choices about which mistakes are acceptable, so they're the author's, not Claude's. The router reads the machine version in `rules/routing_*.yaml`; this file says **why**. Change a rule by writing a new version file, run `python -m harness.router --compare <old> <new>`, and log the decision in `notes/criteria_drift.md`.
+These are policy choices about which mistakes are acceptable, so they're the author's, not Claude's. The router reads the machine version in `rules/routing_*.yaml`; this file says **why**. Change a rule by writing a new version file, run `python -m harness router --compare <old> <new>`, and log the decision in `notes/criteria_drift.md`.
 
 Think in costs: a dangerous answer marked safe (a **miss**) costs far more than a safe answer sent to review (a **false alarm**).
 

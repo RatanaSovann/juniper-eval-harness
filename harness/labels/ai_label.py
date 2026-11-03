@@ -1,10 +1,10 @@
 """Blind AI reference labels: an AI labels one run's answers from a blind label sheet.
 
-Run:  python -m harness.ai_label --sheet data/labels/ai_blind_sheet_88741d.csv --out data/labels/claude_blind_88741d.csv
-      python -m harness.ai_label --sheet ... --out ... --limit 3          (first 3 rows: a cheap trial)
-      python -m harness.ai_label --sheet ... --out ... --partition all    (dev and locked)
+Run:  python -m harness ai_label --sheet data/labels/ai_blind_sheet_88741d.csv --out data/labels/claude_blind_88741d.csv
+      python -m harness ai_label --sheet ... --out ... --limit 3          (first 3 rows: a cheap trial)
+      python -m harness ai_label --sheet ... --out ... --partition all    (dev and locked)
 
-Make the sheet first with python -m harness.label_sheet --run-id <answer run ID>.
+Make the sheet first with python -m harness label_sheet --run-id <answer run ID>.
 
 The labeller sees only what you see in the label app: the question, the expected behaviour,
 the leaflet section(s) for the case, the rubric and the answer. It is never shown the case ID,
@@ -29,10 +29,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from harness.config import ROOT, AiLabellerConfig, Config, JudgeModel, load_config
-from harness.generate import AnthropicModel, ChatModel, CostCapReached, cost_aud, worst_case_aud
-from harness.label_sheet import SCORE_COLUMNS, read_sheet, set_labels, source_excerpts
-from harness.validate_cases import validate
+from harness.core.config import ROOT, AiLabellerConfig, Config, JudgeModel, load_config
+from harness.answers.generate import AnthropicModel, ChatModel, CostCapReached, cost_aud, worst_case_aud
+from harness.labels.label_sheet import SCORE_COLUMNS, read_sheet, set_labels, source_excerpts
+from harness.testset.validate_cases import validate
 
 OUT_COLUMNS = ["run_id", "case_id", "variant", *SCORE_COLUMNS, "label_confidence", "note", "labeller"]
 RETRY_NOTE = "\n\nYour last reply could not be read. Reply with JSON only, in exactly the shape given."
@@ -100,7 +100,7 @@ def select_rows(config: Config, sheet_rows: list[dict], partition: str, limit: i
     """Sheet rows whose case is in the partition ('dev', 'locked' or 'all'), in sheet order."""
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
-        raise ValueError("Test set has problems; run python -m harness.validate_cases")
+        raise ValueError("Test set has problems; run python -m harness validate_cases")
     by_id = {c.case_id: c for c in cases}
     if missing := sorted({r["case_id"] for r in sheet_rows} - by_id.keys()):
         raise ValueError(f"Sheet rows for cases not in the test set: {', '.join(missing)}")
@@ -203,13 +203,13 @@ def make_model(cfg: AiLabellerConfig) -> ChatModel:
     """The labeller's API client. Anthropic via generate.py; others via the judges' clients."""
     if cfg.provider == "anthropic":
         return AnthropicModel(cfg.model, cfg.max_tokens, cfg.temperature)
-    from harness.judge import PROVIDERS  # imported here so an Anthropic run never needs other SDKs
+    from harness.judges.judge import PROVIDERS  # imported here so an Anthropic run never needs other SDKs
     return PROVIDERS[cfg.provider](JudgeModel(name="ai_labeller", **cfg.model_dump(exclude={"prompt"})))
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--sheet", type=Path, required=True, help="blind label sheet from harness.label_sheet")
+    parser.add_argument("--sheet", type=Path, required=True, help="blind label sheet from harness.labels.label_sheet")
     parser.add_argument("--out", type=Path, required=True, help="AI label file to write (or continue)")
     parser.add_argument("--partition", choices=["dev", "locked", "all"], default="dev")
     parser.add_argument("--limit", type=int, help="only the first N rows")
@@ -219,7 +219,7 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config()
     sheet, out = (p if p.is_absolute() else ROOT / p for p in (args.sheet, args.out))
     if not sheet.exists():
-        print(f"No sheet at {sheet}. Make one with python -m harness.label_sheet --run-id <id>. Nothing was sent.")
+        print(f"No sheet at {sheet}. Make one with python -m harness label_sheet --run-id <id>. Nothing was sent.")
         return 1
     problems = setup_problems(config, out)
     if problems:

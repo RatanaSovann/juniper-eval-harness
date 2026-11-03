@@ -3,9 +3,9 @@ import csv
 
 import pytest
 
-from harness.label_sheet import (LABEL_COLUMNS, SHEET_COLUMNS, build_rows, is_labelled, read_sheet, save_sheet,
+from harness.labels.label_sheet import (LABEL_COLUMNS, SHEET_COLUMNS, build_rows, is_labelled, read_sheet, save_sheet,
                                  leaflet_sections, set_labels, source_excerpts, write_sheet)
-from harness.models import TestCase
+from harness.core.models import TestCase
 from tests.test_rule_checks import answer
 from tests.test_validate_cases import GOOD
 

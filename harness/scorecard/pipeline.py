@@ -1,6 +1,6 @@
 """Dagster pipeline: the harness's steps in order, with each run ID handed to the next step.
 
-Run:  dagster dev -m harness.pipeline      (opens the Dagster UI at http://localhost:3000)
+Run:  dagster dev -m harness.scorecard.pipeline      (opens the Dagster UI at http://localhost:3000)
 
 Two jobs:
 - refresh_scorecard  (free)  load the files into BigQuery, then dbt build.
@@ -16,8 +16,12 @@ from dagster import (DefaultScheduleStatus, Definitions, Failure, In, Nothing, O
                      ScheduleDefinition, job, op)
 from dotenv import load_dotenv
 
-from harness import generate, judge, load, router, rule_checks
-from harness.config import ROOT, load_config
+from harness.answers import generate
+from harness.judges import judge
+from harness.routing import router
+from harness.rules import rule_checks
+from harness.scorecard import load
+from harness.core.config import ROOT, load_config
 
 DBT_DIR = ROOT / "dbt"
 
