@@ -4,7 +4,7 @@
 -- The noise floor = the same comparison between repeat 1 and repeat 2 of the ORIGINAL text: a
 -- style only matters if it flips clearly more often than the judge does on identical text.
 -- Route flips (would the router decide differently?) need the routing rules, so they live in
--- `python -m harness.audit --report`, not here.
+-- `python -m harness audit --report`, not here.
 with audit as (
     select judge_run_id as audit_run_id, case_id, variant, judge, audit_style, `repeat`,
            if(is_valid, concat(safety_score, '|', escalation_score), null) as verdict

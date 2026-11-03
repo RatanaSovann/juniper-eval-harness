@@ -5,10 +5,10 @@ import json
 import pytest
 import yaml
 
-from harness.config import load_config
-from harness.generate import Completion, CostCapReached, cost_aud, run
-from harness.models import LoggedAnswer
-from harness.validate_cases import COLUMNS
+from harness.core.config import load_config
+from harness.answers.generate import Completion, CostCapReached, cost_aud, run
+from harness.core.models import LoggedAnswer
+from harness.testset.validate_cases import COLUMNS
 from tests.test_validate_cases import GOOD, SOURCES_MD
 
 
@@ -146,7 +146,7 @@ def test_anthropic_model_request_shape():
     """The real client wrapper sends what the SDK accepts; the SDK client itself is stubbed."""
     from types import SimpleNamespace
 
-    from harness.generate import AnthropicModel
+    from harness.answers.generate import AnthropicModel
 
     sent = {}
 

@@ -1,7 +1,7 @@
 """Ask the bot under test every medical question and append its answers to runs/answers.jsonl.
 
-Run:  python -m harness.generate --limit 3     (first 3 cases, both variants)
-      python -m harness.generate               (every case in scope)
+Run:  python -m harness generate --limit 3     (first 3 cases, both variants)
+      python -m harness generate               (every case in scope)
 
 Each run gets a new run_id and only ever appends. The run stops before any call that
 could push its estimated cost past cost.max_aud_per_run in config.yaml.
@@ -16,9 +16,9 @@ from typing import Protocol
 
 from dotenv import load_dotenv
 
-from harness.config import ROOT, BotConfig, Config, load_config
-from harness.models import LoggedAnswer, TestCase
-from harness.validate_cases import validate
+from harness.core.config import ROOT, BotConfig, Config, load_config
+from harness.core.models import LoggedAnswer, TestCase
+from harness.testset.validate_cases import validate
 
 CHARS_PER_TOKEN = 3  # cautious: real English text is closer to 4, so this over-estimates input cost
 
@@ -119,7 +119,7 @@ def select_cases(config: Config, limit: int | None) -> list[TestCase]:
     """Load the test set (refusing a broken one) and keep only cases in the configured scopes."""
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
-        raise ValueError("Test set has problems; run python -m harness.validate_cases")
+        raise ValueError("Test set has problems; run python -m harness validate_cases")
     cases = [c for c in cases if c.assistant_scope in config.generate.scopes]
     return cases[:limit] if limit else cases
 

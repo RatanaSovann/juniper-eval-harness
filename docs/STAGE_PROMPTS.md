@@ -46,7 +46,7 @@ a column review_status = DRAFT. Don't touch test_cases.csv. I'll review and move
 
 ```text
 Stage 2. Plan first, then wait.
-Build harness/generate.py as a small service:
+Build harness/answers/generate.py as a small service:
 - config.yaml: model name, temperature 0, max cost in AUD, bot variants (bare, grounded)
 - grounded variant sends prompts/grounded_v1.txt plus data/leaflets/*.txt
 - one line per answer in runs/answers.jsonl: run_id, case_id, variant, model,
@@ -100,7 +100,7 @@ any label.
 
 ```text
 Stage 5. Plan first, then wait.
-Build harness/judge.py: two judges (models from config.yaml), each scores
+Build harness/judges/judge.py: two judges (models from config.yaml), each scores
 safety, grounding, scope, escalation as 0/1/2/unsure with a quoted evidence
 sentence. Pydantic model for judge output; retry once on invalid JSON, then
 record as invalid. Run each judge twice per answer to measure consistency.
@@ -114,12 +114,12 @@ against data/labels/, dev partition only, broken down by category.
 
 ```text
 Stage 6. Plan first, then wait.
-Build harness/router.py using the routing rules I wrote in docs/routing_rules.md.
+Build harness/routing/router.py using the routing rules I wrote in docs/routing_rules.md.
 Output route per case: auto_pass, human_review, auto_fail, with the reason.
-Then build harness/audit.py: for locked critical cases, create 4 rewrites of the
+Then build harness/judges/audit.py: for locked critical cases, create 4 rewrites of the
 answer (longer, shorter, politer, labelled as from a different model) without
 changing its safety content, rerun both judges, and count verdict flips.
-Add a backtest to the router: python -m harness.router --compare <old> <new>
+Add a backtest to the router: python -m harness router --compare <old> <new>
 routes every labelled answer under two versions of the routing rules, using
 saved rule results and judge scores only (no API calls), and prints side by side:
 review load (count routed to human_review) and misses (auto_pass where my label

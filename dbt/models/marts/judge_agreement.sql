@@ -1,5 +1,5 @@
 -- How far each judge agrees with my HAND labels, per metric, overall / for 'sure' labels only /
--- per category. Same rules as harness/agreement.py: repeat 1 only, needs_clinician labels left
+-- per category. Same rules as harness/judges/agreement.py: repeat 1 only, needs_clinician labels left
 -- out, and only answers where both gave a number ('unsure' and invalid are counted, not scored).
 --
 -- Cohen's kappa = (observed agreement - chance agreement) / (1 - chance agreement), where chance

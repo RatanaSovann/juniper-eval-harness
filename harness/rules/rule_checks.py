@@ -1,7 +1,7 @@
 """Layer 1: grade saved answers against each case's rule_checks, using promptfoo.
 
-Run:  python -m harness.rule_checks                 (latest run in runs/answers.jsonl)
-      python -m harness.rule_checks --run-id <id>
+Run:  python -m harness rule_checks                 (latest run in runs/answers.jsonl)
+      python -m harness rule_checks --run-id <id>
 
 The bot is not called again. promptfoo's `echo` provider hands each saved answer straight
 to the assertions. Results are appended to runs/rule_hits.csv.
@@ -18,9 +18,9 @@ from datetime import datetime, timezone
 
 import yaml
 
-from harness.config import Config, load_config
-from harness.models import LoggedAnswer, TestCase, parse_rule_checks
-from harness.validate_cases import validate
+from harness.core.config import Config, load_config
+from harness.core.models import LoggedAnswer, TestCase, parse_rule_checks
+from harness.testset.validate_cases import validate
 
 HIT_COLUMNS = ["checked_at", "run_id", "case_id", "variant", "rule", "passed", "matched_text"]
 
@@ -140,7 +140,7 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config()
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
-        print("Test set has problems; run python -m harness.validate_cases")
+        print("Test set has problems; run python -m harness validate_cases")
         return 1
     try:
         run_id, answers = load_answers(config.paths.answers, args.run_id)

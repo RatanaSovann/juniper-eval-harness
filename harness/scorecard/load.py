@@ -1,7 +1,7 @@
 """Copy the harness's logs into BigQuery so dbt can build the scorecard.
 
-Run:  python -m harness.load --dry-run   (build every table locally and print row counts; no cloud calls)
-      python -m harness.load             (replace the raw tables in BigQuery)
+Run:  python -m harness load --dry-run   (build every table locally and print row counts; no cloud calls)
+      python -m harness load             (replace the raw tables in BigQuery)
 
 The files on disk stay the source of truth: they are append-only and never changed here.
 Each load replaces the raw tables in full, so the warehouse is always a rebuildable copy.
@@ -14,9 +14,9 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from harness.config import Config, load_config
-from harness.models import METRICS, Judgement, LoggedAnswer, Rewrite, RouteDecision
-from harness.validate_cases import validate
+from harness.core.config import Config, load_config
+from harness.core.models import METRICS, Judgement, LoggedAnswer, Rewrite, RouteDecision
+from harness.testset.validate_cases import validate
 
 LABEL_COLUMNS = ("run_id", "case_id", "variant", *METRICS, "label_confidence", "note")
 
@@ -48,7 +48,7 @@ def build_tables(config: Config) -> dict[str, list[dict]]:
     """Every raw table as a list of rows, from the files on disk."""
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
-        raise ValueError("Test set has problems; run python -m harness.validate_cases")
+        raise ValueError("Test set has problems; run python -m harness validate_cases")
 
     labels = []
     for kind, paths in (("hand", config.warehouse.hand_labels), ("ai", config.warehouse.ai_labels)):

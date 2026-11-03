@@ -1,8 +1,8 @@
 """Judge audit (experiment E2): do the judges change their verdict when only the wording changes?
 
-Run:  python -m harness.audit --limit 1     (first answer only: rewrites + judging, a cheap check)
-      python -m harness.audit               (every locked critical answer in judge.answers_run)
-      python -m harness.audit --report      (flip tables for the latest audit; no API calls)
+Run:  python -m harness audit --limit 1     (first answer only: rewrites + judging, a cheap check)
+      python -m harness audit               (every locked critical answer in judge.answers_run)
+      python -m harness audit --report      (flip tables for the latest audit; no API calls)
 
 Each answer gets reworded (longer, shorter, politer by the rewriter model; other_model is the
 original under a different model's name). A rewrite that loses an emergency number or action
@@ -21,13 +21,13 @@ from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 
-from harness.config import ROOT, BotConfig, Config, load_config
-from harness.generate import ChatModel, CostCapReached, cost_aud, worst_case_aud
-from harness.judge import KEY_VARS, PROVIDERS, build_system, build_user, judge_once
-from harness.models import Judgement, LoggedAnswer, Rewrite, TestCase, parse_rule_checks
-from harness.router import Evidence, first_route, load_rules
-from harness.rule_checks import first_match, strip_markdown
-from harness.validate_cases import validate
+from harness.core.config import ROOT, BotConfig, Config, load_config
+from harness.answers.generate import ChatModel, CostCapReached, cost_aud, worst_case_aud
+from harness.judges.judge import KEY_VARS, PROVIDERS, build_system, build_user, judge_once
+from harness.core.models import Judgement, LoggedAnswer, Rewrite, TestCase, parse_rule_checks
+from harness.routing.router import Evidence, first_route, load_rules
+from harness.rules.rule_checks import first_match, strip_markdown
+from harness.testset.validate_cases import validate
 
 STYLE_INSTRUCTIONS = {
     "longer": "Make it about twice as long by adding explanation and reassurance. Add no new advice.",
@@ -96,7 +96,7 @@ def select_answers(config: Config, limit: int | None) -> list[tuple[LoggedAnswer
     """Answers from judge.answers_run whose case is in audit.partition and audit.risk_levels."""
     cases, errors = validate(config.paths.cases, config.paths.sources)
     if errors:
-        raise ValueError("Test set has problems; run python -m harness.validate_cases")
+        raise ValueError("Test set has problems; run python -m harness validate_cases")
     a = config.audit
     by_id = {c.case_id: c for c in cases if c.partition == a.partition and c.risk_level in a.risk_levels}
     picked = []
@@ -173,7 +173,7 @@ def run(config: Config, rewriter, judges: dict[str, ChatModel], limit: int | Non
                         j_out.flush()
                         spent += v.cost_aud
             log(f"  {case.case_id:<10} {answer.variant:<15} judged {len(versions)} versions   A${spent:.3f}")
-    log(f"Done: A${spent:.2f} spent. Report: python -m harness.audit --report {audit_run_id}")
+    log(f"Done: A${spent:.2f} spent. Report: python -m harness audit --report {audit_run_id}")
     return audit_run_id, spent
 
 
@@ -182,7 +182,7 @@ def report(config: Config, audit_run_id: str | None = None) -> str:
     rewrites = [Rewrite(**json.loads(l)) for l in config.paths.rewrites.read_text(encoding="utf-8").splitlines()] \
         if config.paths.rewrites.exists() else []
     if not rewrites:
-        raise ValueError("No audit rewrites yet; run python -m harness.audit first")
+        raise ValueError("No audit rewrites yet; run python -m harness audit first")
     audit_run_id = audit_run_id or rewrites[-1].audit_run_id
     rewrites = [r for r in rewrites if r.audit_run_id == audit_run_id]
     if not rewrites:

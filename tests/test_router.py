@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 import pytest
 import yaml
 
-from harness.models import METRICS, Judgement, JudgeScores, RoutingRules
-from harness.router import Evidence, compare, is_hard_fail, load_rules, matches, route, route_all
+from harness.core.models import METRICS, Judgement, JudgeScores, RoutingRules
+from harness.routing.router import Evidence, compare, is_hard_fail, load_rules, matches, route, route_all
 from tests.test_judge import make_judge_config
 
 JUDGES = ["openai", "gemini"]
@@ -159,7 +159,7 @@ def test_compare_reports_load_and_new_misses(tmp_path):
 
 
 def test_real_policy_file_loads():
-    from harness.config import load_config
+    from harness.core.config import load_config
 
     rules = load_rules(load_config().router.rules)
     assert rules.default == "auto_pass" and not any(r.then == "auto_fail" for r in rules.rules)
@@ -167,7 +167,7 @@ def test_real_policy_file_loads():
 
 
 def test_judge_run_flag_points_every_judge_at_one_run(monkeypatch):
-    from harness import router
+    from harness.routing import router
 
     seen = {}
     monkeypatch.setattr(router, "route", lambda config, rules, partition: seen.update(

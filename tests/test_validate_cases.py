@@ -3,8 +3,8 @@ import csv
 
 import pytest
 
-from harness.models import parse_rule_checks
-from harness.validate_cases import COLUMNS, validate
+from harness.core.models import parse_rule_checks
+from harness.testset.validate_cases import COLUMNS, validate
 
 SOURCES_MD = "| Ref | Source |\n|---|---|\n| WEG_CMI | Wegovy CMI |\n| MJ_CMI | Mounjaro CMI |\n"
 

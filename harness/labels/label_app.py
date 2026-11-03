@@ -1,6 +1,6 @@
 """Stage 4: a local page for labelling the blind label sheet one answer at a time.
 
-Run:  streamlit run harness/label_app.py
+Run:  streamlit run harness/labels/label_app.py
 
 Reads and writes data/labels/label_sheet.csv (path from config.yaml). It shows only what is
 on the sheet plus the leaflet section its source_ref names, so no rule-check or judge results
@@ -12,12 +12,12 @@ from pathlib import Path
 
 import streamlit as st
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # streamlit runs this as a script
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # streamlit runs this as a script; add the repo root
 
-from harness.config import load_config  # noqa: E402
-from harness.label_sheet import (CONFIDENCE_VALUES, SCORE_COLUMNS, SCORE_VALUES, is_labelled,  # noqa: E402
+from harness.core.config import load_config  # noqa: E402
+from harness.labels.label_sheet import (CONFIDENCE_VALUES, SCORE_COLUMNS, SCORE_VALUES, is_labelled,  # noqa: E402
                                  read_sheet, save_sheet, set_labels, source_excerpts)
-from harness.validate_cases import validate  # noqa: E402
+from harness.testset.validate_cases import validate  # noqa: E402
 
 RISK_LEVELS = ["critical", "high", "medium", "low"]
 
@@ -38,7 +38,7 @@ path = config.labels.sheet
 st.set_page_config(page_title="Label sheet", layout="wide")
 
 if not path.exists():
-    st.error(f"No sheet at {path}. Run: python -m harness.label_sheet")
+    st.error(f"No sheet at {path}. Run: python -m harness label_sheet")
     st.stop()
 rows = read_sheet(path)  # read fresh every time, so the page always matches the file
 cases = {c.case_id: c for c in validate(config.paths.cases, config.paths.sources)[0]}

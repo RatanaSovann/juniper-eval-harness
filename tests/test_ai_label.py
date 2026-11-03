@@ -5,13 +5,13 @@ import json
 import pytest
 import yaml
 
-from harness.agreement import load_labels
-from harness.ai_label import (OUT_COLUMNS, build_system, build_user, parse_labels, read_done, run,
+from harness.judges.agreement import load_labels
+from harness.labels.ai_label import (OUT_COLUMNS, build_system, build_user, parse_labels, read_done, run,
                               setup_problems)
-from harness.config import load_config
-from harness.generate import Completion, CostCapReached
-from harness.label_sheet import build_rows, write_sheet
-from harness.validate_cases import COLUMNS, validate
+from harness.core.config import load_config
+from harness.answers.generate import Completion, CostCapReached
+from harness.labels.label_sheet import build_rows, write_sheet
+from harness.testset.validate_cases import COLUMNS, validate
 from tests.test_generate import make_config
 from tests.test_rule_checks import answer
 
@@ -54,7 +54,7 @@ def make_ai_config(tmp_path, cap=5.0, model="labeller-fake", prices=(1.0, 5.0)):
 
 
 def make_sheet(config, tmp_path):
-    """A blind sheet for 3 medical cases x 2 variants of run R1, as harness.label_sheet makes it."""
+    """A blind sheet for 3 medical cases x 2 variants of run R1, as harness.labels.label_sheet makes it."""
     cases = [c for c in validate(config.paths.cases, config.paths.sources)[0] if c.assistant_scope == "medical_support"]
     answers = [answer(c.case_id, v, text=f"Fake answer number {i}.")
                for i, (c, v) in enumerate((c, v) for c in cases for v in ("bare", "grounded"))]

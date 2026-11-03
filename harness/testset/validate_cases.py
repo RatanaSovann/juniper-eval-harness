@@ -1,7 +1,7 @@
 """Check the test set is clean before we run anything on it.
 
-Run:  python -m harness.validate_cases            (owner columns may be blank)
-      python -m harness.validate_cases --strict   (owner columns must be filled)
+Run:  python -m harness validate_cases            (owner columns may be blank)
+      python -m harness validate_cases --strict   (owner columns must be filled)
 """
 import argparse
 import csv
@@ -12,11 +12,8 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from harness.models import OWNER_COLUMNS, TestCase
-
-ROOT = Path(__file__).resolve().parent.parent
-CASES = ROOT / "data" / "test_cases.csv"
-SOURCES = ROOT / "data" / "sources.md"
+from harness.core.config import load_config
+from harness.core.models import OWNER_COLUMNS, TestCase
 
 COLUMNS = list(TestCase.model_fields)
 
@@ -80,7 +77,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--strict", action="store_true", help="fail if owner columns are blank")
     args = parser.parse_args(argv)
 
-    cases, errors = validate(CASES, SOURCES, strict=args.strict)
+    config = load_config()
+    cases, errors = validate(config.paths.cases, config.paths.sources, strict=args.strict)
     print_summary(cases)
     if errors:
         print("PROBLEMS:")

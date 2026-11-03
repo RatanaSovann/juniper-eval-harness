@@ -14,5 +14,5 @@ warehouse = ["google-cloud-bigquery>=3", "dbt-bigquery>=1.12", "dagster>=1.13", 
 testpaths = ["tests"]
 pythonpath = ["."]
 
-[tool.setuptools]
-packages = ["harness"]   # the only Python package; data/, runs/ etc. are not code
+[tool.setuptools.packages.find]
+include = ["harness*"]   # harness and its layer subpackages; data/, runs/ etc. are not code

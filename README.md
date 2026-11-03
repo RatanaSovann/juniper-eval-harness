@@ -131,9 +131,9 @@ kappa = (agreement − luck) ÷ (1 − luck)
 
 In this demo, I'm the reviewer. In production, it would be a clinician.
 
-1. **Label blind.** The labelling app (`streamlit run harness/label_app.py`) shows the question, the answer and the leaflet section it should match. It never shows judge scores, rule results or risk level, so the reviewer can't be anchored by the machine.
+1. **Label blind.** The labelling app (`streamlit run harness/labels/label_app.py`) shows the question, the answer and the leaflet section it should match. It never shows judge scores, rule results or risk level, so the reviewer can't be anchored by the machine.
 2. **Score** safety, grounding, scope and escalation (0, 1, 2 or `unsure`), plus a confidence: `sure`, `fairly_sure` or `needs_clinician`.
-3. **Compare.** `python -m harness.agreement` lines up judges and labels and lists every disagreement.
+3. **Compare.** `python -m harness agreement` lines up judges and labels and lists every disagreement.
 4. **Settle disagreements** against the leaflet. Sometimes the judge is wrong; sometimes the label is. A changed label is logged in `notes/criteria_drift.md`, marked as no longer blind, and both numbers are reported.
 5. **Feed back.** Labels are used to measure the judges (kappa, catches) and to backtest routing policies. They never feed the router directly, because real chats won't have labels.
 
@@ -197,12 +197,12 @@ You've written `prompts/grounded_v3.txt` and want to know if it's safer.
 
 ```
 # 1. Add it as a variant under generate.variants in config.yaml, then:
-python -m harness.generate --limit 5          # dry run: read the 5 answers yourself
-python -m harness.generate                    # full run (stops at the A$5 cap)
-python -m harness.rule_checks                 # exact-fact rules, no model calls
-python -m harness.judge                       # both judges, twice each
-python -m harness.router                      # route every answer
-python -m harness.load; cd dbt; dbt build     # refresh the scorecard
+python -m harness generate --limit 5          # dry run: read the 5 answers yourself
+python -m harness generate                    # full run (stops at the A$5 cap)
+python -m harness rule_checks                 # exact-fact rules, no model calls
+python -m harness judge                       # both judges, twice each
+python -m harness router                      # route every answer
+python -m harness load; cd dbt; dbt build     # refresh the scorecard
 ```
 
 **What to look for:** did the severe miss rate or review load change? If `dbt build` fails, a hard fail was auto-passed. Don't ship v3.
@@ -213,8 +213,8 @@ You want to see if a cheaper judge is good enough.
 
 ```
 # 1. Add it under judge.judges in config.yaml (model + list price), then:
-python -m harness.judge --labelled --only <new_judge>    # only answers that have labels
-python -m harness.agreement                              # kappa and catches vs my labels
+python -m harness judge --labelled --only <new_judge>    # only answers that have labels
+python -m harness agreement                              # kappa and catches vs my labels
 ```
 
 **What to look for:** how many hand-labelled hard fails did it catch? A high kappa means little if it missed a dangerous answer.
@@ -225,7 +225,7 @@ You think a rule sends too many answers to review.
 
 ```
 # 1. Copy rules/routing_v2.yaml to routing_v3.yaml and edit it, then:
-python -m harness.router --compare rules/routing_v2.yaml rules/routing_v3.yaml
+python -m harness router --compare rules/routing_v2.yaml rules/routing_v3.yaml
 ```
 
 **What to look for:** reviews saved vs new misses. Adopt v3 only if it misses nothing new, then log the decision and its trade-off in `notes/criteria_drift.md`.
@@ -233,8 +233,8 @@ python -m harness.router --compare rules/routing_v2.yaml rules/routing_v3.yaml
 ### 4. Checking whether the judges are swayed by style
 
 ```
-python -m harness.audit             # reword critical answers, re-judge them
-python -m harness.audit --report    # flips per style, against the same-text noise floor
+python -m harness audit             # reword critical answers, re-judge them
+python -m harness audit --report    # flips per style, against the same-text noise floor
 ```
 
 **What to look for:** a style that flips verdicts more than identical text does. That judge is reacting to wording, not safety.
@@ -272,18 +272,19 @@ API keys go in a git-ignored `.env`: `ANTHROPIC_API_KEY` (bot, rewriter), `OPENA
 
 | Step | Command |
 |---|---|
-| Check the test set | `python -m harness.validate_cases` |
-| Generate answers | `python -m harness.generate` |
-| Rule checks | `python -m harness.rule_checks` |
-| Label answers | `streamlit run harness/label_app.py` |
-| Judge answers | `python -m harness.judge` (`--labelled`, `--only <judge>`, `--resume <id>`) |
-| Agreement report | `python -m harness.agreement` |
-| Route answers | `python -m harness.router` |
-| Backtest two policies | `python -m harness.router --compare <old.yaml> <new.yaml>` |
-| Judge audit | `python -m harness.audit`, then `--report` |
-| Load into BigQuery | `python -m harness.load` (`--dry-run` to preview); needs `gcloud auth application-default login` |
+| Check the test set | `python -m harness validate_cases` |
+| Generate answers | `python -m harness generate` |
+| Rule checks | `python -m harness rule_checks` |
+| Label answers | `streamlit run harness/labels/label_app.py` |
+| Judge answers | `python -m harness judge` (`--labelled`, `--only <judge>`, `--resume <id>`) |
+| Agreement report | `python -m harness agreement` |
+| Route answers | `python -m harness router` |
+| Backtest two policies | `python -m harness router --compare <old.yaml> <new.yaml>` |
+| Judge audit | `python -m harness audit`, then `--report` |
+| Blind AI labels | `python -m harness ai_label --sheet <blind sheet> --out <ai label file>` (`--limit 3` to trial) |
+| Load into BigQuery | `python -m harness load` (`--dry-run` to preview); needs `gcloud auth application-default login` |
 | Build the scorecard | `cd dbt; dbt build` |
-| Pipeline UI | `dagster dev -m harness.pipeline`: `refresh_scorecard` (free) and `full_eval` (paid, ~A$5) |
+| Pipeline UI | `dagster dev -m harness.scorecard.pipeline`: `refresh_scorecard` (free) and `full_eval` (paid, ~A$5) |
 | Redraw README diagrams | `python docs/make_readme_diagrams.py` |
 
 ## Repo map
@@ -291,7 +292,11 @@ API keys go in a git-ignored `.env`: `ANTHROPIC_API_KEY` (bot, rewriter), `OPENA
 ```
 data/      test cases, sources, leaflets, labels
 rubric/    scoring rubric
-harness/   generate, rule checks, label app, judges, agreement, router, audit, load, pipeline
+harness/   the code, one folder per layer; run any command as python -m harness <command>
+  core/       config + data templates (models)     testset/    test-set validator
+  answers/    L0 generate                          rules/      L1 rule checks
+  judges/     L2 judges, agreement, L5 audit       labels/     L3 label sheet, label app, AI labeller
+  routing/    L4 router                            scorecard/  L6 BigQuery load, Dagster pipeline
 prompts/   bot and judge instructions
 rules/     routing policies (versioned YAML)
 runs/      append-only run logs
